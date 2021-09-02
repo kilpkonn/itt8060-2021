@@ -51,11 +51,31 @@ let sentenceCount (text:string) = (text.Split [|'.'; '!'; '?'|] |> Array.length)
 //    which prints the same stats as showWordCount +
 //    the number of sentences and average length of sentences
 //    hint: try float: 'int -> float'
+let stats (text: string) = 
+  let sentences : int = sentenceCount text
+  printf "Sentences: %d\n" sentences
+  printf "Avg length: %f\n" <| (text.Split ' ' |> Array.length |> float) / (float sentences)
+  ()
 
 // 7. Use the 'http' function from the lecture to download the file
 //    http://dijkstra.cs.ttu.ee/~juhan/itt8060/text.txt as a string
 //    NOTE: you cannot use this function in tryfsharp. Instead you can
 //    paste the text into your file as a string and process it locally
+open System.IO
+open System.Net
+let http (url: string) = 
+    let req = System.Net.WebRequest.Create url
+    let resp = req.GetResponse()
+    let stream = resp.GetResponseStream()
+    let reader = new StreamReader(stream)
+    let html = reader.ReadToEnd()
+    resp.Close()
+    html
+
+
+let resp = http "http://dijkstra.cs.ttu.ee/~juhan/itt8060/text.txt"
+File.WriteAllText ("./out.txt", resp)
 
 // 8. run 'stats' on the downloaded file
+stats resp
 

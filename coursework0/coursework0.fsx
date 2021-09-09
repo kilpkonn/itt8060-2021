@@ -76,6 +76,3 @@ let http (url: string) =
 let resp = http "http://dijkstra.cs.ttu.ee/~juhan/itt8060/text.txt"
 File.WriteAllText ("./out.txt", resp)
 
-// 8. run 'stats' on the downloaded file
-stats resp
-

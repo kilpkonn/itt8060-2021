@@ -99,6 +99,11 @@ let compareAuthorsYears (xs, _, _, yearA) (ys, _, _, yearB) : int =
 // publication in ascending order.
 // If two items are at the same level in the sort order, their order should be preserved.
 
+let rec merge (xs : 'a list) (ys : 'a list) =
+  match (xs, ys) with
+  | ([], ys) -> ys
+  | (x :: xs, ys) -> x :: (merge xs ys)
+
 let rec filter (f: 'a -> bool) (xs : 'a list) =
   match xs with
   | [] -> []
@@ -113,11 +118,11 @@ let rec sortBy (f: 'a -> 'a -> int) (xs : 'a list) =
   | x :: xs ->
     let smaller = filter ((<) 0 << f x) xs
     let bigger = filter ((>) 0 << f x) xs
-    let same = filter ((=) 0 << f x) xs
-    (sortBy f smaller) @ same @ (sortBy f bigger)
+    let same = x :: filter ((=) 0 << f x) xs
+    merge (sortBy f smaller) (merge same (sortBy f bigger))
 
 let sortBibliographyByNumPages (xs : BibliographyItem list) : BibliographyItem list =
-  sortBy (fun (_, _, (s1, e1), _) (_, _, (s2, e2), _) -> (s1 - e1) - (s2 - e2)) xs
+  sortBy (fun (_, _, (s1, e1), _) (_, _, (s2, e2), _) -> (e1 - s1) - (e2 - s2)) xs
 
 // 6. Make a function 
 // sortBibliographyByAuthorNumPages : BibliographyItem list -> BibliographyItem list
@@ -126,7 +131,7 @@ let sortBibliographyByNumPages (xs : BibliographyItem list) : BibliographyItem l
 let sortBibliographyByAuthorNumPages (xs : BibliographyItem list) : BibliographyItem list =
   let cmp = fun (a1, _, (s1, e1), _) (a2, _, (s2, e2), _) -> 
     match compareLists a1 a2 with
-    | 0 -> (s1 - e1) - (s2 - e2)
+    | 0 -> (e1 - s1) - (e2 - s2)
     | n -> n
   sortBy cmp xs
 
@@ -156,9 +161,16 @@ let rec groupByAuthor (items : BibliographyItem list) =
           let (_, rest) = filterItems author bs
           (author, b :: rest)
         | false -> filterItems author bs
-
-    match authors with
-    | a :: authors -> (filterItems a xs) :: groupByAuthor xs
-    | [] -> groupByAuthor xs
-
+    let rec authorsAcc (authors: string list) (xs: BibliographyItem list) = 
+      match xs with
+      | [] -> []
+      | x :: xs ->
+        match authors with
+        | a :: authors -> 
+          let (_, filtered) = filterItems a xs
+          let rest = authorsAcc authors (x :: xs) 
+          let rest = filter (fun (v, _) -> not (System.String.Equals(a, v))) rest
+          (a, x :: filtered) :: rest
+        | [] -> groupByAuthor xs
+    authorsAcc authors (x :: xs)
 

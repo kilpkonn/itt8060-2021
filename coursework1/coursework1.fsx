@@ -78,7 +78,7 @@ let intAndBool = (1, true)
 //   2 * m <= n < 2 * (m + 1)
 // 
 // You may assume that the argument is non-negative.
-let atMostHalf (n : int) : int = (n + 1) / 2
+let atMostHalf (n : int) : int = n / 2
   
 
 

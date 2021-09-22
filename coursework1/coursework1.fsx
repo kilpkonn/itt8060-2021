@@ -57,7 +57,7 @@
 
 // 1. Associate an identifier `intAndBool` with a value that is a pair of
 // an `int` and a `bool`.
-let intAndBool (n : int) (b : bool) = (n, b)
+let intAndBool = (1, true)
 
 
 

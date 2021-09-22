@@ -1,5 +1,4 @@
 (*
-
   Department of Software Science
   Tallinn University of Technology
   ------------------------------------

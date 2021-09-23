@@ -176,7 +176,7 @@ let rec multSkipFromTo (k : int) (m : int) (n : int) : int =
 // https://oeis.org/A006577
 let rec threeN (n : int) : int = 
   if n = 1 then 0 
-  else if n % 2 = 0 then 1 + threeN n / 2
+  else if n % 2 = 0 then 1 + threeN (n / 2)
   else 1 + threeN (3 * n + 1)
 
 

@@ -211,12 +211,12 @@ let rec threeN (n : int) : int =
 // Use recursion.
 let rec notFibonacci (n : int) : (int * int) =
   match n with
-    | 0 -> (2, 0)
-    | 1 -> (1, 0)
+    | 0 -> (2, 1)
+    | 1 -> (1, 1)
     | _ -> 
       let a = notFibonacci (n - 2)
       let b = notFibonacci (n - 1)
-      ((fst a) + (fst b), 2 + (snd a) + (snd b))
+      ((fst a) + (fst b), 1 + (snd a) + (snd b))
 
 
 

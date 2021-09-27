@@ -208,9 +208,16 @@ let perform (c : Command) (s : State) : State =
 // This must be implemented using a fold over the list of moves. (You
 // can choose whether to use fold or foldBack.)
 
-let perform (cs : Command list) (s : State) : State =
-  failwith "please implement this"
+// NOTE: Not sure how to fold with iterate without cheating and using length
+let rec foldBack (f  : 'a -> 'b -> 'b) (xs : 'a list) (b  : 'b) : 'b =
+  match xs with
+  | []       -> b
+  | x :: xs' -> f x (foldBack f xs' b)
 
+
+
+let perform (cs : Command list) (s : State) : State =
+  foldBack perform cs s
 
 
 // 4. Define the function
@@ -221,6 +228,8 @@ let perform (cs : Command list) (s : State) : State =
 // is replaced with Step -n. Leave other commands the same.
 //
 // Implement this using List.map
+let flipSteps (cs : Command list) : Command list =
+  List.map (fun c -> match c with | Step n -> Step -n | c -> c) cs
 
 
 
@@ -235,7 +244,8 @@ let perform (cs : Command list) (s : State) : State =
 // after performing Turn n. Leave other commands the same.
 //
 // Implement this using List.map
-
+let flipTurns (cs : Command list) : Command list =
+  List.map (fun c -> match c with | Turn n -> Turn -n | c -> c) cs
 
 
 

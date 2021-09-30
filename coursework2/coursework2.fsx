@@ -83,13 +83,18 @@ let rec compareLists (xs : string list) (ys : string list) : int =
 // compareAuthors : BibliographyItem -> BibliographyItem -> int
 // that takes two instances of bibliography items and compares them according to the authors.
 // Use solution from task 3.
-let compareAuthors ((xs, _, _, _) : BibliographyItem) ((ys, _, _, _) : BibliographyItem) : int = compareLists xs ys
+let compareAuthors (a : BibliographyItem) (b : BibliographyItem) : int = 
+  let (xs, _, _, _) = a
+  let (ys, _, _, _) = b
+  compareLists xs ys
 
 // 4. Make a function
 // compareAuthorsYears : BibliographyItem -> BibliographyItem -> int
 // that takes two instances of bibliography items and compares them according to the authors and if the authors are 
 // the same then according to years.
-let compareAuthorsYears ((xs, _, _, yearA) : BibliographyItem) ((ys, _, _, yearB) : BibliographyItem) : int = 
+let compareAuthorsYears (a : BibliographyItem) (b : BibliographyItem) : int = 
+  let (xs, _, _, yearA) = a
+  let (ys, _, _, yearB) = b
   match compareLists xs ys with
   | 0 -> compare yearA yearB
   | n -> n

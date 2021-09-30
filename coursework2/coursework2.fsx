@@ -73,8 +73,8 @@ let bibliographyData: BibliographyItem list = [
 let rec compareLists xs ys =
   match (xs, ys) with
     | ([], []) -> 0
-    | ([],  _) -> 1
-    | (_,  []) -> -1
+    | ([],  _) -> -1
+    | (_,  []) -> 1
     | (x :: xs, y :: ys) -> match System.String.Compare(x, y) with  // <- Can we write it in "functional" way?
                             | 0 -> compareLists xs ys
                             | n -> n

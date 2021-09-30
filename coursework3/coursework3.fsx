@@ -307,7 +307,7 @@ let simplify (cs : Command list) : Command list =
     | x :: xs -> 
       match (x, c) with
       | (Step n, Step m) -> (Step (m + n)) :: xs
-      | (Turn n, Turn m) -> (Turn (m + n)) :: xs
+      | (Turn n, Turn m) -> (Turn ((m + n) % 4)) :: xs
       | _ -> c :: x :: xs
   List.fold siplifyAcc [] (unpackLoops cs)
 

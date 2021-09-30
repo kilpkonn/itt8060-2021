@@ -138,7 +138,7 @@ let sortBibliographyByAuthorNumPages (xs : BibliographyItem list) : Bibliography
 
 // 7. Make a function
 // groupByAuthor : BibliographyItem list -> (string * BibliographyItem list) list
-// where the return list contains pairs where the first element is the name of a single
+// where the return list contains pairs where the first element is the name of a single 
 // author and the second element a list of bibliography items that the author has co-authored.
 
 let rec contains (x : 'a) (xs : 'a list) =

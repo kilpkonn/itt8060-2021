@@ -88,6 +88,12 @@ let compareAuthors (a : BibliographyItem) (b : BibliographyItem) : int =
   let (ys, _, _, _) = b
   compareLists xs ys
 
+let compareAuthorsNumPages ((xs, _, (startA, endA) , _) : BibliographyItem)
+  ((ys, _, (startB, endB), _) : BibliographyItem) : int =
+  match compareLists xs ys with
+  | 0 -> compare (endA - startA) (endB - startB)
+  | n -> n
+
 // 4. Make a function
 // compareAuthorsYears : BibliographyItem -> BibliographyItem -> int
 // that takes two instances of bibliography items and compares them according to the authors and if the authors are 

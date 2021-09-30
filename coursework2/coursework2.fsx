@@ -70,7 +70,7 @@ let bibliographyData: BibliographyItem list = [
 // The sort order in .Net is defined using System.Globalization.CultureInfo:
 // https://docs.microsoft.com/en-us/dotnet/api/system.globalization
 // Please note that your solution should not force a particular sort order!
-let rec compareLists xs ys =
+let rec compareLists (xs : string list) (ys : string list) : int =
   match (xs, ys) with
     | ([], []) -> 0
     | ([],  _) -> -1
@@ -83,13 +83,13 @@ let rec compareLists xs ys =
 // compareAuthors : BibliographyItem -> BibliographyItem -> int
 // that takes two instances of bibliography items and compares them according to the authors.
 // Use solution from task 3.
-let compareAuthors (xs, _, _, _) (ys, _, _, _) : int = compareLists xs ys
+let compareAuthors ((xs, _, _, _) : BibliographyItem) ((ys, _, _, _) : BibliographyItem) : int = compareLists xs ys
 
 // 4. Make a function
 // compareAuthorsYears : BibliographyItem -> BibliographyItem -> int
 // that takes two instances of bibliography items and compares them according to the authors and if the authors are 
 // the same then according to years.
-let compareAuthorsYears (xs, _, _, yearA) (ys, _, _, yearB) : int = 
+let compareAuthorsYears ((xs, _, _, yearA) : BibliographyItem) ((ys, _, _, yearB) : BibliographyItem) : int = 
   match compareLists xs ys with
   | 0 -> compare yearA yearB
   | n -> n
@@ -147,7 +147,7 @@ let rec contains (x : 'a) (xs : 'a list) =
   | [] -> false
   | y :: ys -> if y = x then true else contains x ys
 
-let rec groupByAuthor (items : BibliographyItem list) =
+let rec groupByAuthor (items : BibliographyItem list) : (string * BibliographyItem list) list =
   match items with
   | [] -> []
   | x :: xs ->

@@ -191,9 +191,9 @@ let performCommand (c : Command) (s : State) : State =
   | (Loop (m, n), { position = pos; direction = dir; history = hist}) ->
     let tmpDir1 = if m >= 0 then dir else turn (turn dir)
     let tmpDir2 = if n >= 0 then turn dir else turn (turn (turn dir))
-    let a = iterate m (step tmpDir1) pos // Negative ?
-    let b = iterate n (step (turn tmpDir2)) a
-    let c = iterate m (step (turn (turn tmpDir1))) b
+    let a = iterate (abs m) (step tmpDir1) pos // Negative ?
+    let b = iterate (abs n) (step (turn tmpDir2)) a
+    let c = iterate (abs m) (step (turn (turn tmpDir1))) b
     { position = pos; direction = dir; history = c :: b :: a :: pos :: hist }
 
 

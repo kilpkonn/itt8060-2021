@@ -33,7 +33,6 @@
   Please check the Moodle page of the course for updates:
 
   https://moodle.taltech.ee/course/view.php?id=31760
-
 *)
 
 // The task is to model an object that can move on a plane where

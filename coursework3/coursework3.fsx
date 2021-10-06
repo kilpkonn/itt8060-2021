@@ -179,7 +179,7 @@ let step (d : Dir) (xy : XY) : XY =
 //
 // The history is represented so that the most recent item is at the head.
 
-let perform (c : Command) (s : State) : State =
+let performCommand (c : Command) (s : State) : State =
   match (c, s) with
   | (Step n, { position = pos; direction = dir; history = hist}) ->
     let tmpDir = if n >= 0 then dir else turn (turn dir)
@@ -207,16 +207,9 @@ let perform (c : Command) (s : State) : State =
 // This must be implemented using a fold over the list of moves. (You
 // can choose whether to use fold or foldBack.)
 
-// NOTE: Not sure how to fold with iterate without cheating and using length
-let rec foldBack (f  : 'a -> 'b -> 'b) (xs : 'a list) (b  : 'b) : 'b =
-  match xs with
-  | []       -> b
-  | x :: xs' -> f x (foldBack f xs' b)
 
-
-
-let perform (cs : Command list) (s : State) : State =
-  foldBack perform cs s
+let performCommands (cs : Command list) (s : State) : State =
+  List.foldBack performCommand cs s
 
 
 // 4. Define the function
@@ -256,6 +249,8 @@ let flipTurns (cs : Command list) : Command list =
 // that removes from the given list of commands all those that are of the
 // form Loop (m, n) or that are of the form Step k where the absolute
 // value of k is not equal to 1.
+let singleSteps (cs : Command list) : Command list =
+  List.filter (fun c -> match c with | Loop _ -> false | Step n -> n = 1 | _ -> true) cs
 
 
 
@@ -269,6 +264,10 @@ let flipTurns (cs : Command list) : Command list =
 // other commands the same.
 //
 // Implement this using List.collect
+let unpackLoops (cs : Command list) : Command list =
+  List.collect (fun c -> match c with 
+                         | Loop (m, n) -> [Step m; Turn 1; Step n; Turn 1; Step m; Turn 1; Step n; Turn 1] 
+                         | c -> [c]) cs
 
 
 
@@ -300,5 +299,14 @@ let flipTurns (cs : Command list) : Command list =
 //   a sequence of Step or a sequence of Turn moves. If the next move
 //   you see is of a different kind, then you first simplify this part,
 //   add it to the simplified part and then continue.
-
+let simplify (cs : Command list) : Command list =
+  let siplifyAcc (xs : Command list) (c : Command) : Command list =
+    match xs with
+    | [] -> [c]
+    | x :: xs -> 
+      match (x, c) with
+      | (Step n, Step m) -> (Step (m + n)) :: xs
+      | (Turn n, Turn m) -> (Turn ((m + n) % 4)) :: xs
+      | _ -> c :: x :: xs
+  List.fold siplifyAcc [] (unpackLoops cs)
 

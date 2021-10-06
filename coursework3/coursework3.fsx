@@ -310,3 +310,4 @@ let simplify (cs : Command list) : Command list =
       | _ -> c :: x :: xs
   List.fold siplifyAcc [] (unpackLoops cs)
 
+

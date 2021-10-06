@@ -192,7 +192,7 @@ let performCommand (c : Command) (s : State) : State =
     let a = iterate m (step dir) pos // Negative ?
     let b = iterate n (step (turn dir)) a
     let c = iterate m (step (turn (turn dir))) b
-    { position = pos; direction = dir; history = pos :: c :: b :: a :: hist }
+    { position = pos; direction = dir; history = c :: b :: a :: pos :: hist }
 
 
 

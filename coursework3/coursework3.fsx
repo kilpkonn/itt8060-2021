@@ -314,15 +314,13 @@ let simplify (cs : Command list) : Command list =
     // | Step 0 | Turn 0 -> xs
     | c ->
       match xs with
-      | [] -> match c with 
-              // | Turn n -> if n % 4 = 0 then [Turn ((4 + (n % 4)) % 4)] else [] 
-              | c -> [c]
+      | [] -> [c] //[match c with | Turn n -> Turn ((4 + (n % 4)) % 4)| c -> c]
       | x :: xs ->
         match (x, c) with
         | (Step n, Step m) -> 
-          (Step (m + n)) :: xs
+          if m + n = 0 then xs else (Step (m + n)) :: xs
         | (Turn n, Turn m) -> 
-          (Turn ((4 + (m + n) % 4) % 4)) :: xs
+          if (m + n) % 4 = 0 then xs else (Turn ((4 + (m + n) % 4) % 4)) :: xs
         | _ -> (match c with | Turn n -> Turn ((4 + (n % 4)) % 4)| c -> c) :: x :: xs
   List.foldBack siplifyAcc cs []
 

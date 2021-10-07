@@ -246,7 +246,7 @@ let flipSteps (cs : Command list) : Command list =
 //
 // Implement this using List.map
 let flipTurns (cs : Command list) : Command list =
-  List.map (fun c -> match c with | Turn n -> Turn -(n % 2) | c -> c) cs
+  List.map (fun c -> match c with | Turn n -> Turn (n - 2) | c -> c) cs
 
 
 

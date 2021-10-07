@@ -195,7 +195,12 @@ let performCommand (c : Command) (s : State) : State =
     let a = iterate (abs m) (step tmpDir1) pos // Negative ?
     let b = iterate (abs n) (step tmpDir2) a
     let c = iterate (abs m) (step (turn (turn tmpDir1))) b
-    { position = pos; direction = dir; history = c :: b :: a :: pos :: hist }
+    let newHist = match (m, n) with
+                  | (0, 0) -> hist
+                  | (_, 0) -> a :: pos :: hist
+                  | (0, _) -> b :: pos :: hist
+                  | _ -> c :: b :: a :: pos :: hist
+    { position = pos; direction = dir; history = newHist }
 
 
 

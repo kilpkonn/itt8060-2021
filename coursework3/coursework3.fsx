@@ -184,7 +184,8 @@ let performCommand (c : Command) (s : State) : State =
   | (Step n, { position = pos; direction = dir; history = hist}) ->
     let tmpDir = if n >= 0 then dir else turn (turn dir)
     let newPos = iterate (abs n) (step tmpDir) pos
-    { position = newPos; direction = dir; history = pos :: hist }
+    let newHist = if n <> 0 then  pos :: hist else hist 
+    { position = newPos; direction = dir; history = newHist }
   | (Turn n, { position = pos; direction = dir; history = hist}) ->
     let newDir = iterate (4 + n % 4) turn dir
     { position = pos; direction = newDir; history = hist }

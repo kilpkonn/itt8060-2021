@@ -311,7 +311,7 @@ let unpackLoops (cs : Command list) : Command list =
 let simplify (cs : Command list) : Command list =
   let siplifyAcc (c : Command) (xs : Command list) : Command list =
     match c with
-    | Step 0 | Turn 0 -> xs
+    // | Step 0 | Turn 0 -> xs
     | c ->
       match xs with
       | [] -> [match c with | Turn n -> Turn ((4 + (n % 4)) % 4)| c -> c]

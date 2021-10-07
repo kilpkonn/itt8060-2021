@@ -314,7 +314,7 @@ let simplify (cs : Command list) : Command list =
     // | Step 0 | Turn 0 -> xs
     | c ->
       match xs with
-      | [] -> [c] //[match c with | Turn n -> Turn ((4 + (n % 4)) % 4)| c -> c]
+      | [] -> [match c with | Turn n -> Turn ((4 + (n % 4)) % 4)| c -> c]
       | x :: xs ->
         match (x, c) with
         | (Step n, Step m) -> 

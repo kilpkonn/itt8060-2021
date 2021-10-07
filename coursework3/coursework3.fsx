@@ -309,14 +309,14 @@ let unpackLoops (cs : Command list) : Command list =
 //   you see is of a different kind, then you first simplify this part,
 //   add it to the simplified part and then continue.
 let simplify (cs : Command list) : Command list =
-  let siplifyAcc (xs : Command list) (c : Command) : Command list =
+  let siplifyAcc (c : Command) (xs : Command list) : Command list =
     match xs with
     | [] -> [c]
     | x :: xs -> 
       match (x, c) with
       | (Step n, Step m) -> (Step (m + n)) :: xs
-      | (Turn n, Turn m) -> (Turn ((m + n) % 4)) :: xs
+      | (Turn n, Turn m) -> (Turn (4 + (m + n) % 4)) :: xs
       | _ -> c :: x :: xs
-  List.fold siplifyAcc [] (unpackLoops cs)
+  List.foldBack siplifyAcc cs []
 
 

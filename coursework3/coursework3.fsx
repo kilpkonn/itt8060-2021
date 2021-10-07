@@ -259,7 +259,7 @@ let flipTurns (cs : Command list) : Command list =
 // form Loop (m, n) or that are of the form Step k where the absolute
 // value of k is not equal to 1.
 let singleSteps (cs : Command list) : Command list =
-  List.filter (fun c -> match c with | Loop _ -> false | Step n -> n = 1 | _ -> true) cs
+  List.filter (fun c -> match c with | Loop _ -> false | Step n -> abs n = 1 | _ -> true) cs
 
 
 

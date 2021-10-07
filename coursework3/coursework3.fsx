@@ -217,7 +217,8 @@ let performCommand (c : Command) (s : State) : State =
 
 
 let performCommands (cs : Command list) (s : State) : State =
-  List.foldBack performCommand cs s
+  // List.foldBack performCommand cs s
+  List.fold (fun s c -> performCommand c s) s cs
 
 
 // 4. Define the function

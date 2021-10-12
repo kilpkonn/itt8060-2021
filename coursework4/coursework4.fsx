@@ -302,7 +302,9 @@ let rec show (e : Ecma) : string =
   | Object o -> "{" + (List.fold(fun acc (n, v) -> acc + (if acc = "" then "\"" else ",\"") + n + "\":"+ show v) "" o) + "}"
   | List l -> "[" + (List.fold(fun acc v -> acc + (if acc = "" then "" else ",") + show v) "" l) + "]"
   | String s -> "\"" + s + "\""
-  | v -> string v
+  | Null -> "null"
+  | Float n -> string n
+  | Bool b -> string b
 
 
 

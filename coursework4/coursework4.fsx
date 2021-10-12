@@ -284,7 +284,6 @@ let rec listPaths (e : Ecma) : Path list =
 
 
 
-
 //// Task 5 ////
 
 // Define the function
@@ -304,7 +303,7 @@ let rec show (e : Ecma) : string =
   | String s -> "\"" + s + "\""
   | Null -> "null"
   | Float n -> string n
-  | Bool b -> string b
+  | Bool b -> if b then "true" else "false"
 
 
 

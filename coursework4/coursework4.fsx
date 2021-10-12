@@ -204,8 +204,8 @@ let addValue (v : Ecma) (obj : Ecma) =
 //   1 + countValues e <= countValues (addNameValue (n, v) e)    // if e is an object representation
 let rec countValues (e : Ecma) : int =
   match e with
-  | Object o -> List.fold (fun acc (_, v) -> acc + 1 + countValues v) 1 o
-  | List l -> List.fold (fun acc v -> acc + 1 + countValues v) 1 l
+  | Object o -> List.fold (fun acc (_, v) -> acc + 1 + countValues v) 0 o
+  | List l -> List.fold (fun acc v -> acc + 1 + countValues v) 0 l
   | _ -> 1
 
 

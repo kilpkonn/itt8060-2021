@@ -275,7 +275,7 @@ let test = Object [
   ]
 
 let rec listPaths (e : Ecma) : Path list =
-  let prefixAll v xs = match xs with | [] -> [[]] | xs -> List.map (fun ys -> v :: ys) xs  // TODO: Why this broken: List.map ( (::) v) xs
+  let prefixAll v xs = match xs with | [] -> [] | xs -> List.map (fun ys -> v :: ys) xs  // TODO: Why this broken: List.map ( (::) v) xs
   match e with
   | Object o -> [] :: List.collect (fun (name, value) -> prefixAll name (listPaths value)) o
   | List l -> [] :: List.filter (fun v -> match v with [] -> false | _ -> true) (List.collect (listPaths) l)

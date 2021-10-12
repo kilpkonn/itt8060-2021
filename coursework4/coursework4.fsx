@@ -353,4 +353,5 @@ let rec delete (ps : Path list) (e : Ecma) : Ecma =
 // 
 // The result list must respect the ordering requirements from Task 4.
 
-
+let withPath (ps : Path list) (e : Ecma) : Ecma list =
+  failwith "TODO"

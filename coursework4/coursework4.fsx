@@ -158,7 +158,7 @@ let mkNull () = Null
 //   pair (n, v), otherwise.
 let addNameValue (name : string, value : Ecma) (obj : Ecma) =
   match obj with
-  | Object items -> Object ((name, value) :: items)
+  | Object items -> Object (items @ [(name, value)])
   | e -> e
 
 
@@ -264,11 +264,18 @@ type Path = Name list
 //   were added to the object (most recently added appears last).
 //
 // Note that the empty list denotes the path to the root object.
+
+let test = Object [
+  ("xyz", Object [("a", Float 1.0); ("b", Object [("b", String "b")])]);
+  ("xs", List[
+    Object [("a", String "a")]; Float 1.0; Bool true;
+    Object [("b", String "b")]]); ("abc", Bool false)]
+
 let rec listPaths (e : Ecma) : Path list =
   let prefixAll v xs = match xs with | [] -> [[v]] | xs -> List.map (fun ys -> v :: ys) xs  // TODO: Why this broken: List.map ( (::) v) xs
   match e with
   | Object o -> List.collect (fun (name, value) -> prefixAll name (listPaths value)) o
-  | List l ->  List.collect listPaths l
+  | List l -> [] :: List.collect listPaths l
   | _ -> []
 
 

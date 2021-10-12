@@ -178,7 +178,7 @@ let addNameValue (name : string, value : Ecma) (obj : Ecma) =
 //   element, otherwise.
 let addValue (v : Ecma) (obj : Ecma) =
   match obj with
-  | List items -> List (v :: items)
+  | List items -> List (items @ [v])
   | e -> e
 
 

@@ -269,7 +269,7 @@ let rec listPaths (e : Ecma) : Path list =
   match e with
   | Object o -> List.collect (fun (name, value) -> prefixAll name (listPaths value)) o
   | List l ->  List.collect listPaths l
-  | _ -> []
+  | _ -> [[]]
 
 
 

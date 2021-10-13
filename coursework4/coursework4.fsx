@@ -338,7 +338,7 @@ let rec deletePath (path : Path) (e : Ecma) : Ecma =
     | List l ->
       List (List.foldBack (fun v acc -> match v with 
                                         | Object o -> match deletePath [p] v with
-                                                      | Object [] -> acc
+                                                      | Object [] -> (Object []) :: acc
                                                       | xs -> xs :: acc
                                         | v -> v :: acc) l [])
     | e -> e

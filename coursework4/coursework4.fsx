@@ -342,23 +342,18 @@ let rec deletePath (path : Path) (e : Ecma) : Ecma =
   | [p] -> 
     match e with
     | Object o ->
-      Object (List.filter (fun (n, v) -> n <> p) o) // match v with
-                                         // | Object _ -> true
-                                         // | List _ -> true 
-                                         // | _ -> n <> p) o)
+      Object (List.filter (fun (n, v) -> n <> p) o)
     | List l -> List (List.map (deletePath [p]) l)
-      // List (List.foldBack (fun v acc -> match v with 
-      //                                   | Object o -> (deletePath [p] v) :: acc // match deletePath [p] v with
-      //                                                // | Object [] -> (Object []) :: acc
-      //                                                 // | xs -> xs :: acc
-      //                                   | v -> v :: acc) l [])
     | e -> e
   | p :: ps ->
     match e with
     | Object o -> 
       Object (List.map (fun (n, v) -> if n = p then (n, (deletePath ps v)) else (n, v)) o)
-    | List l -> List (List.map (fun v -> match v with | Object o -> deletePath ps v | List l -> deletePath ps v | o -> o) l)
-    | e -> e // _ -> failwith "Cannot delete!"
+    | List l -> List (List.map (fun v -> match v with
+                                         | Object o -> deletePath (p :: ps) v 
+                                         | List l -> deletePath (p :: ps) v 
+                                         | o -> o) l)
+    | e -> e
 
 let rec delete (ps : Path list) (e : Ecma) : Ecma =
   match ps with

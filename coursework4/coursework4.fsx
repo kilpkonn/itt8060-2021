@@ -342,10 +342,10 @@ let rec deletePath (path : Path) (e : Ecma) : Ecma =
   | [p] -> 
     match e with
     | Object o ->
-      Object (List.filter (fun (n, v) -> n <> p) o) // match v with
-                                         // | Object _ -> true
-                                         // | List _ -> true 
-                                         // | _ -> n <> p) o)
+      Object (List.filter (fun (n, v) -> match v with
+                                         | Object _ -> true
+                                         | List _ -> true 
+                                         | _ -> n <> p) o)
     | List l -> // List (List.map (deletePath [p]) l)
       List (List.foldBack (fun v acc -> match v with 
                                         | Object o -> match deletePath [p] v with

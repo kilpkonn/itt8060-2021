@@ -325,6 +325,17 @@ let rec show (e : Ecma) : string =
 //
 // When the user attempts to delete the root object, delete should throw
 // an exception. Hint: use `failwith` in the appropriate case.
+let testDelete = Object [
+  ("abc", Bool false);
+  ("abc", Bool false);
+  ("xs", List[
+    Object [("a", String "a")]; Float 1.0; Bool true;
+    Object [("b", String "b")]]);
+  ("xyz", Object [("a", Float 1.0); ("b", Object [("b", String "b")])]);
+  ("ws", Bool false)
+  ]
+
+
 let rec deletePath (path : Path) (e : Ecma) : Ecma =
   match path with
   | [] -> failwith "Cannot delete root"
@@ -335,12 +346,12 @@ let rec deletePath (path : Path) (e : Ecma) : Ecma =
                                          // | Object _ -> true
                                          // | List _ -> true 
                                          // | _ -> n <> p) o)
-    | List l ->
-      List (List.foldBack (fun v acc -> match v with 
-                                        | Object o -> (deletePath [p] v) :: acc // match deletePath [p] v with
-                                                      // | Object [] -> (Object []) :: acc
-                                                      // | xs -> xs :: acc
-                                        | v -> v :: acc) l [])
+    | List l -> List (List.map (deletePath [p]) l)
+      // List (List.foldBack (fun v acc -> match v with 
+      //                                   | Object o -> (deletePath [p] v) :: acc // match deletePath [p] v with
+      //                                                // | Object [] -> (Object []) :: acc
+      //                                                 // | xs -> xs :: acc
+      //                                   | v -> v :: acc) l [])
     | e -> e
   | p :: ps ->
     match e with

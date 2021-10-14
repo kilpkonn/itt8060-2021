@@ -356,7 +356,7 @@ let rec deletePath (path : Path) (e : Ecma) : Ecma =
   | p :: ps ->
     match e with
     | Object o -> 
-      Object (List.map (fun (n, v) -> if n = p then (n, (deletePath ps v)) else (n, v)) o)
+      Object (List.map (fun (n, v) -> (n, deletePath ps v)) o)// if n = p then (n, (deletePath ps v)) else (n, v)) o)
     | List l -> List (List.map (fun v -> match v with | Object o -> deletePath ps v | List l -> deletePath ps v | o -> o) l)
     | _ -> failwith "Cannot delete!"
 

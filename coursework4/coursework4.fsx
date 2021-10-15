@@ -385,7 +385,10 @@ let rec selectPath (ps : Path) (e : Ecma) : Ecma =
     | Object o ->
       Object (List.fold (fun acc (n, v) -> if n = p then (n, (selectPath ps v)) :: acc else acc) [] o)
     | List l ->
-      List (List.map (selectPath ps) l)
+      List (List.fold (fun acc o -> match selectPath (p :: ps) o with
+                                    | Object [] -> acc
+                                    | Object x -> (Object x) :: acc
+                                    | _ -> acc) [] l)
     | _ -> e // TODO: Check
 
 let withPath (ps : Path list) (e : Ecma) : Ecma list =

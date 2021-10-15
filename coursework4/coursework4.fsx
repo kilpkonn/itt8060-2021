@@ -399,7 +399,7 @@ let rec delete (ps : Path list) (e : Ecma) : Ecma =
 
 let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
   match ps with
-  | [] -> [e]
+  | [] -> []
   | p :: ps ->
     match e with
     | Object o ->

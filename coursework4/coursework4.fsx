@@ -330,7 +330,8 @@ let testDelete = Object [
   ("abc", Bool false);
   ("xs", List[
     Object [("a", String "a")]; Float 1.0; Bool true;
-    Object [("b", String "b")]]);
+    Object [("b", String "b")];
+    Object [("a", String "a")]]);
   ("xyz", Object [("a", Float 1.0); ("b", Object [("b", String "b")])]);
   ("ws", Bool false)
   ]
@@ -412,5 +413,5 @@ let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
     | _ -> []
 
 let withPath (ps : Path list) (e : Ecma) : Ecma list =
-  List.distinct (List.collect (fun p -> selectPath p e) ps)
+  (List.collect (fun p -> selectPath p e) ps)
 

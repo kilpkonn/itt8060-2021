@@ -377,19 +377,21 @@ let rec delete (ps : Path list) (e : Ecma) : Ecma =
 // 
 // The result list must respect the ordering requirements from Task 4.
 
-let rec selectPath (ps : Path) (e : Ecma) : Ecma =
-  match ps with
-  | [] -> e
-  | p :: ps ->
-    match e with
-    | Object o ->
-      Object (List.fold (fun acc (n, v) -> if n = p then (n, (selectPath ps v)) :: acc else acc) [] o)
-    | List l ->
-      List (List.fold (fun acc o -> match selectPath (p :: ps) o with
-                                    | Object [] -> acc
-                                    | Object x -> (Object x) :: acc
-                                    | _ -> acc) [] l)
-    | _ -> e // TODO: Check
-
+// let rec selectPath (ps : Path) (e : Ecma) : Ecma =
+//   match ps with
+//   | [] -> e
+//   | p :: ps ->
+//     match e with
+//     | Object o ->
+//       Object (List.fold (fun acc (n, v) -> if n = p then (n, (selectPath ps v)) :: acc else acc) [] o)
+//     | List l ->
+//       List (List.fold (fun acc o -> match selectPath (p :: ps) o with
+//                                     | Object [] -> acc
+//                                     | Object x -> (Object x) :: acc
+//                                     | _ -> acc) [] l)
+//     | _ -> e // TODO: Check
+// 
+// let withPath (ps : Path list) (e : Ecma) : Ecma list =
+//   List.map (fun p -> selectPath p e) ps
 let withPath (ps : Path list) (e : Ecma) : Ecma list =
-  List.map (fun p -> selectPath p e) ps
+  List.map (fun p -> delete (List.filter ((<>) p) (listPaths e)) e) ps

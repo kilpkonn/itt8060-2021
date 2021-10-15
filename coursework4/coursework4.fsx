@@ -403,9 +403,9 @@ let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
   | p :: ps ->
     match e with
     | Object o ->
-      List.distinct (List.collect (fun (n, v) -> if n = p then selectPath ps v else []) o)
+      List.collect (fun (n, v) -> if n = p then selectPath ps v else []) o
     | List l ->
-      List.distinct (List.collect (fun o -> selectPath (p :: ps) o) l)
+      List.collect (fun v -> selectPath (ps) v) l
     | _ -> []
 
 let withPath (ps : Path list) (e : Ecma) : Ecma list =

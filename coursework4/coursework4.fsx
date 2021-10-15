@@ -393,5 +393,20 @@ let rec delete (ps : Path list) (e : Ecma) : Ecma =
 // 
 // let withPath (ps : Path list) (e : Ecma) : Ecma list =
 //   List.map (fun p -> selectPath p e) ps
+
+// let withPath (ps : Path list) (e : Ecma) : Ecma list =
+//   List.map (fun p -> delete (List.filter ((<>) p) (listPaths e)) e) ps
+
+let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
+  match ps with
+  | [] -> [e]
+  | p :: ps ->
+    match e with
+    | Object o ->
+      List.collect (fun (n, v) -> if n = p then selectPath ps v else []) o
+    | List l ->
+      List.collect (fun o -> selectPath (p :: ps) o) l
+    | _ -> []
+
 let withPath (ps : Path list) (e : Ecma) : Ecma list =
-  List.map (fun p -> delete (List.filter ((<>) p) (listPaths e)) e) ps
+  List.collect (fun p -> selectPath p e) ps

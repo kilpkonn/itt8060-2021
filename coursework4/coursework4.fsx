@@ -399,14 +399,14 @@ let rec delete (ps : Path list) (e : Ecma) : Ecma =
 
 let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
   match ps with
-  | [] -> []
+  | [] -> match e with | Object o -> [e] | _ -> []
   | p :: ps ->
     match e with
     | Object o ->
       List.collect (fun (n, v) -> if n = p then selectPath ps v else []) o
     | List l ->
       List.collect (fun o -> selectPath (p :: ps) o) l
-    | _ -> [e]
+    | _ -> []
 
 let withPath (ps : Path list) (e : Ecma) : Ecma list =
   List.collect (fun p -> selectPath p e) ps

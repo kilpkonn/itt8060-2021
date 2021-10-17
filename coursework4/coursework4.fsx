@@ -416,4 +416,4 @@ let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
     | _ -> []
 
 let withPath (ps : Path list) (e : Ecma) : Ecma list =
-  List.rev (List.collect (fun p -> List.rev (selectPath p e)) (List.filter (fun p -> List.contains p ps) (listPaths e)))
+  List.collect (fun p -> selectPath p e) (List.filter (fun p -> List.contains p ps) (listPaths e))

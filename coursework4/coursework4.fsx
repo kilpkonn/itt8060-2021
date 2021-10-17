@@ -417,5 +417,5 @@ let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
 
 let withPath (ps : Path list) (e : Ecma) : Ecma list =
   let ePaths = listPaths e
-  let paths = List.sortBy (fun p -> -(List.findIndex ((=) p) ePaths)) ps
+  let paths = List.sortBy (fun p -> List.findIndex ((=) p) ePaths) ps
   List.collect (fun p -> selectPath p e) (List.distinct paths)

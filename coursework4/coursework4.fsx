@@ -410,7 +410,7 @@ let rec selectPath (ps : Path) (e : Ecma) : Ecma list =
   | p :: ps ->
     match e with
     | Object o ->
-      List.collect (fun (n, v) -> if n = p then selectPath ps v else []) o
+      List.collect (fun (n, v) -> if n = p then List.rev (selectPath ps v) else []) o
     | List l ->
       List.rev (List.collect (fun v -> selectPath (p :: ps) v) l)
     | _ -> []

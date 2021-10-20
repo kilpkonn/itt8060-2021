@@ -408,7 +408,6 @@ let test = Object [
 ]
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
-  let prefixPaths curr = List.map (fun (p, e) -> (curr :: p, e))
   match s with
   | Match expr ->
     if eval expr e then [([], e)] else []
@@ -459,7 +458,24 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
 // for the values selected by s, the string values and numeric values
 // of that value have been updated according to the functions su and nu.
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
-  failwith "."
+  let mapVal v = match v with | String s -> String (sFn s) | Float n -> Float (nFn n) | _ -> v
+  match s with
+  | Match expr ->
+    if not (eval expr e) then e else
+      match e with
+      | Object o -> Object (List.map (fun (k, v) -> (k, mapVal v)) o)
+      | List l -> List (List.map mapVal l)
+      | _ -> e
+  | Sequence (s1, s2) ->
+    match e with
+    | Object o -> 
+      let mapHelper = fun (k, v) ->
+        let s1Res = select s1 v
+        let doS2 = fun 
+      e
+    | List l -> e
+    | _ -> e
+  | OneOrMore s -> e
 
 
 

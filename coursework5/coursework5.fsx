@@ -398,6 +398,14 @@ type Path = Description list
 // that instead of a BExpr we have a Selector and instead of a bool we
 // compute a (Path * Ecma) list. In this case we also consider child
 // values.
+let test = Object [
+  ("abc", Bool false);
+  ("xs", List[
+    Object [("a", String "a")]; Float 1.0; Bool true;
+    Object [("b", String "b")]]);
+  ("xyz", Object [("a", Float 1.0); ("b", Object [("b", String "b")])]);
+  ("ws", Bool false)
+]
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   let prefixPaths curr = List.map (fun (p, e) -> (curr :: p, e))
@@ -408,7 +416,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     match e with
     | Object o -> 
       let selectHelper = fun (n, v) ->
-        let s1Res = select s1 e
+        let s1Res = select s1 v  // Or e, desc fucked up again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
@@ -416,11 +424,11 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       List.collect selectHelper o
     | List l -> 
       let selectHelper = fun (i, acc) v ->
-        let s1Res = select s1 e
+        let s1Res = select s1 v  // Or e, desc fucked again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res
-        if s1Res <> [] then (i + 1, (List.collect doS2 s1Res) @ acc) else (i + 1, acc)
+        if s1Res <> [] then (i + 1, acc @ (List.collect doS2 s1Res)) else (i + 1, acc)
       snd (List.fold selectHelper (0, []) l)
     | _ -> []
   | OneOrMore s ->

@@ -311,7 +311,7 @@ let b2 = HasNumericValueInRange (-5.0, 5.0)
 let b3 = Or (HasStringValue "b3", HasKey "b3")
 
 let s1 = Sequence (Match True, Sequence (Match True, Match (HasKey "abc")))
-let s2 = Sequence (Match (HasStringValue "xyz"), OneOrMore (Match (HasStringValue "xyz")))  // NOTE: Not sure if this desc is even acheivable
+let s2 = OneOrMore (Sequence (Sequence (Match True, (Match (HasStringValue "xyz"))), OneOrMore (Match True)))
 let s3 = Sequence (Match (Not (HasStringValue "xyz")), Match True)
 
 
@@ -400,7 +400,31 @@ type Path = Description list
 // values.
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
-  failwith "..."
+  let prefixPaths curr = List.map (fun (p, e) -> (curr :: p, e))
+  match s with
+  | Match expr ->
+    if eval expr e then [([], e)] else []
+  | Sequence (s1, s2) ->
+    match e with
+    | Object o -> 
+      let selectHelper = fun (n, v) ->
+        let s1Res = select s1 e
+        let doS2 = fun (path, ecma) ->
+          let s2Res = select s2 ecma
+          List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
+        if s1Res <> [] then List.collect doS2 s1Res else []
+      List.collect selectHelper o
+    | List l -> 
+      let selectHelper = fun (i, acc) v ->
+        let s1Res = select s1 e
+        let doS2 = fun (path, ecma) ->
+          let s2Res = select s2 ecma
+          List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res
+        if s1Res <> [] then (i + 1, (List.collect doS2 s1Res) @ acc) else (i + 1, acc)
+      snd (List.fold selectHelper (0, []) l)
+    | _ -> []
+  | OneOrMore s ->
+    (select s e) @ (select (Sequence (s, OneOrMore s)) e)  // NOTE: Pigem on retard nõue, et oleks muu järjekord
 
 
 

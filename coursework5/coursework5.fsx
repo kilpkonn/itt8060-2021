@@ -469,9 +469,9 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
   | Sequence (s1, s2) ->
     match e with
     | Object o -> 
-      let mapHelper = fun (k, v) ->
-        let s1Res = select s1 v
-        let doS2 = fun 
+      // let mapHelper = fun (k, v) ->
+        // let s1Res = select s1 v
+        // let doS2 = fun 
       e
     | List l -> e
     | _ -> e

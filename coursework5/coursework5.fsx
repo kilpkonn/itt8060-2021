@@ -360,8 +360,8 @@ let rec eval (expr : BExpr) (e : Ecma) : bool =
   | HasNull ->
     match e with
     | Null -> true
-    | Object o -> List.exists (fun (_, v) -> match v with | Null -> true | _ -> false) o
-    | List l -> List.exists (fun v -> match v with | Null -> true | _ -> false) l
+    | Object o -> List.exists (fun (_, v) -> match v with | Null | Object _ | List _  -> true | _ -> false) o
+    | List l -> List.exists (fun v -> match v with | Null | Object _ | List _ -> true | _ -> false) l
     | _ -> false
 
 
@@ -415,7 +415,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     match e with
     | Object o -> 
       let selectHelper = fun (n, v) ->
-        let s1Res = select s1 v  // Or e, desc fucked up again
+        let s1Res = select s1 e  // Or v, desc fucked up again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
@@ -423,7 +423,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       List.collect selectHelper o
     | List l -> 
       let selectHelper = fun (i, acc) v ->
-        let s1Res = select s1 v  // Or e, desc fucked again
+        let s1Res = select s1 e  // Or v, desc fucked again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res
@@ -432,10 +432,6 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     | _ -> []
   | OneOrMore s ->
     (select s e) @ (select (Sequence (s, OneOrMore s)) e)  // NOTE: Pigem on retard nõue, et oleks muu järjekord
-
-
-
-
 
 
 
@@ -457,26 +453,52 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
 // evaluates to an Ecma that is otherwise the same as e except that,
 // for the values selected by s, the string values and numeric values
 // of that value have been updated according to the functions su and nu.
-let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
-  let mapVal v = match v with | String s -> String (sFn s) | Float n -> Float (nFn n) | _ -> v
-  match s with
-  | Match expr ->
-    if not (eval expr e) then e else
-      match e with
-      | Object o -> Object (List.map (fun (k, v) -> (k, mapVal v)) o)
-      | List l -> List (List.map mapVal l)
-      | _ -> e
-  | Sequence (s1, s2) ->
-    match e with
-    | Object o -> 
-      // let mapHelper = fun (k, v) ->
-        // let s1Res = select s1 v
-        // let doS2 = fun 
-      e
-    | List l -> e
-    | _ -> e
-  | OneOrMore s -> e
 
+let rec mapPath (f : Ecma -> Ecma option) (path : Path) (e : Ecma) : Ecma option =
+  match path with
+  | [] -> f e
+  // | [Key p] -> 
+  //   match e with
+  //   | Object o -> 
+  //     Object (List.fold (fun acc (n, v) -> 
+  //       if n = p then match f v with | Some v -> (n, v) :: acc | None -> acc
+  //       else (n, v) :: acc) [] o)
+  //   | _ -> Some e
+  // | [Index p] -> 
+  //   match e with
+  //   | List l -> 
+  //     List (snd (List.fold (fun (i, acc) v -> 
+  //       if i = p then (i+1, match f v with | Some v -> v :: acc | None -> acc) 
+  //       else (i+1, v :: acc)) (0, []) l))
+  //   | _ -> Some e
+  | (Key p) :: ps ->
+    match e with
+    | Object o ->
+      Object (List.map (fun (n, v) -> if n = p then (n, (mapPath f ps v)) else (n, Some v)) o
+      |> List.filter (fun v -> (snd v).IsSome)
+      |> List.map (fun (n, v) -> (n, v.Value))) |> Some
+    | _ -> Some e
+  | (Index p) :: ps ->
+    match e with
+    | List l -> 
+      List ((snd (List.fold (fun (i, acc) v -> 
+        if i = p then (i+1, (mapPath f ps v) :: acc)
+        else (i+1, (Some v) :: acc)) (0, []) l))
+      |> List.filter (fun v -> v.IsSome)
+      |> List.map (fun v -> v.Value)) |> Some
+    | _ -> Some e
+
+let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option =
+  match ps with
+  | [] -> Some e
+  | p :: ps -> Option.bind (map f ps) (mapPath f p e)
+
+
+
+let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
+  let mapVal v = Some (match v with | String s -> String (sFn s) | Float n -> Float (nFn n) | _ -> v)
+  let paths = List.map fst (select s e)
+  (map mapVal paths e).Value  // Very nice F#
 
 
 
@@ -494,7 +516,8 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
 // The result should be `None` when after the delete operation there
 // is no `Ecma` value left. Otherwise use `Some`.
 let delete (s : Selector) (e : Ecma) : Ecma option =
-  failwith "."
+  let paths = List.map fst (select s e)
+  map (fun _ -> None) paths e
 
 
 
@@ -528,10 +551,10 @@ let delete (s : Selector) (e : Ecma) : Ecma option =
 // These functions should not be defined recursively; define them in
 // terms of update.
 let toZero (n : float) (s : Selector) (e : Ecma) : Ecma = 
-  failwith "."
+  update id (fun v -> if abs v < n then 0.0 else v) s e  // Or Sequence(s, HasNumericValueInRange(-n, n))
 
 let truncate (n : int) (s : Selector) (e : Ecma) : Ecma =
-  failwith "."
+  update (fun v -> if v.Length < n then v else v.Substring(0, n)) id s e
 
 
 
@@ -551,5 +574,6 @@ let truncate (n : int) (s : Selector) (e : Ecma) : Ecma =
 // This function should not be defined recursively; define it in
 // terms of update.
 let mapEcma (strFn : string -> string) (nFn : float -> float) (e : Ecma) : Ecma =
-  failwith "."
+  let s = OneOrMore (Match True)
+  update strFn nFn s e
 

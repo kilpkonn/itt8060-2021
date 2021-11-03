@@ -409,6 +409,7 @@ let test = Object [
 ]
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
+  let prefix p ps =  List.map (fun (a, b) -> (p :: a, b)) ps
   match s with
   | Match expr ->
     if eval expr e then [([], e)] else []
@@ -433,8 +434,10 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     | _ -> []
   | OneOrMore s ->
     match e with
-    | Object o -> (select s e) @ (List.collect (fun (_, v) -> select s v) o)
-    | List l -> (select s e) @ (List.collect (select s) l)
+    | Object o -> (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select s v)) o)
+    | List l -> 
+      let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = (i+1, (prefix (Index i) (select s v)) @ acc)
+      (select s e) @ (snd (List.fold helper (0, []) l))
     | _ -> select s e
 
 

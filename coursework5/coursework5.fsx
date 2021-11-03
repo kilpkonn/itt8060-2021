@@ -335,6 +335,7 @@ let s3 = Sequence (Match (Not (HasStringValue "xyz")), Match True)
 let rec eval (expr : BExpr) (e : Ecma) : bool =
   match expr with
   | True -> true
+  | _ -> true
   | Not expr -> not (eval expr e)
   | And (expr1, expr2) -> (eval expr1 e) && (eval expr2 e)
   | Or (expr1, expr2) -> (eval expr1 e) || (eval expr2 e)

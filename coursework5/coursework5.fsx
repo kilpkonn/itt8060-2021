@@ -416,7 +416,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | Sequence (s1, s2) ->
     match e with
     | Object o -> 
-      if o = [] then [] else failwith $"s: $s.ToString() e: $e.ToString()"
+      if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
       // let selectHelper = fun (n, v) ->
       //   let s1Res = select s1 e  // Or v, desc fucked up again
       //   let doS2 = fun (path, ecma) ->

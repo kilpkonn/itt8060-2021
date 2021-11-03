@@ -412,7 +412,6 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   match s with
   | Match expr ->
     if eval expr e then [([], e)] else []
-  | _ -> []
   | Sequence (s1, s2) ->
     match e with
     | Object o -> 
@@ -433,7 +432,8 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       snd (List.fold selectHelper (0, []) l)
     | _ -> []
   | OneOrMore s ->
-    (select s e) @ (select (Sequence (s, OneOrMore s)) e)  // NOTE: Pigem on retard nõue, et oleks muu järjekord
+    []
+    //(select s e) @ (select (Sequence (s, OneOrMore s)) e)  // NOTE: Pigem on retard nõue, et oleks muu järjekord
 
 
 

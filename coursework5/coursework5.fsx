@@ -335,7 +335,7 @@ let s3 = Sequence (Match (Not (HasStringValue "xyz")), Match True)
 let rec eval (expr : BExpr) (e : Ecma) : bool =
   match expr with
   | True -> true
-  | Not expr2 -> not (eval expr2 e)
+  | Not expr -> not (eval expr e)
   | And (expr1, expr2) -> (eval expr1 e) && (eval expr2 e)
   | Or (expr1, expr2) -> (eval expr1 e) || (eval expr2 e)
   | HasKey key ->
@@ -412,6 +412,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   match s with
   | Match expr ->
     if eval expr e then [([], e)] else []
+  | _ -> []
   | Sequence (s1, s2) ->
     match e with
     | Object o -> 

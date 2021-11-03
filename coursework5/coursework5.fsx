@@ -432,8 +432,10 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       snd (List.fold selectHelper (0, []) l)
     | _ -> []
   | OneOrMore s ->
-    []
-    //(select s e) @ (select (Sequence (s, OneOrMore s)) e)  // NOTE: Pigem on retard nõue, et oleks muu järjekord
+    match e with
+    | Object o -> (select s e) @ (List.collect (fun (_, v) -> select s v) o)
+    | List l -> (select s e) @ (List.collect (select s) l)
+    | _ -> select s e
 
 
 

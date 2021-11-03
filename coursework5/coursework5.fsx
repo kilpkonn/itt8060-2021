@@ -408,6 +408,19 @@ let test = Object [
   ("ws", Bool false)
 ]
 
+let st1 = Sequence (Match True, Sequence (Match True, Match True))
+let et1 = Object [("a", Object [
+  ("age", String "oldest")]); 
+  ("b", Object [("age", String "middle")]);
+  ("a", Object [("age", String "oldest")])
+]
+let st2 = Sequence (Match True, Sequence (Match True, Match True))
+let et2 = Object [
+  ("a", Object [("age", String "oldest")]);
+  ("b", Object [("age", String "middle")]);
+  ("a", Object [("age", String "youngest")])
+]
+
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   let prefix p ps =  List.map (fun (a, b) -> (p :: a, b)) ps
   match s with
@@ -416,14 +429,14 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | Sequence (s1, s2) ->
     match e with
     | Object o -> 
-      if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-      // let selectHelper = fun (n, v) ->
-      //   let s1Res = select s1 e  // Or v, desc fucked up again
-      //   let doS2 = fun (path, ecma) ->
-      //     let s2Res = select s2 ecma
-      //     List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
-      //   if s1Res <> [] then List.collect doS2 s1Res else []
-      // List.collect selectHelper o
+      // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+      let selectHelper = fun (n, v) ->
+        let s1Res = select s1 e  // Or v, desc fucked up again
+        let doS2 = fun (path, ecma) ->
+          let s2Res = select s2 ecma
+          List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
+        if s1Res <> [] then List.collect doS2 s1Res else []
+      List.collect selectHelper o
     | List l -> 
       let selectHelper = fun (i, acc) v ->
         let s1Res = select s1 e  // Or v, desc fucked again

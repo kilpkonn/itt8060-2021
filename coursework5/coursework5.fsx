@@ -307,7 +307,7 @@ described by s : Selector as the set of values selected by s.
 // 
 // We consider the root value to be at depth 1.
 let b1 = And (And (HasKey "blue", HasKey "left"), Not(HasKey "red"))
-let b2 = And (HasNull, HasNumericValueInRange (-5.0, 5.0))
+let b2 = And (Not (HasNumericValueInRange (5.0, 6.0)), HasNumericValueInRange (-5.0, 5.0))
 let b3 = Or (HasStringValue "b3", HasKey "b3")
 
 let s1 = Sequence (Match True, Sequence (Match True, Match (HasKey "abc")))

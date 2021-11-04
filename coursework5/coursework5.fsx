@@ -435,21 +435,21 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       let doS2 n v : (Path * Ecma) list = List.map (fun (pth, ecm) -> (path @ (n :: pth), ecm)) (select s2 v)
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
-      | List l -> 
-        snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
+      | List l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
       | _ -> []
     List.collect helper s1Res
   | OneOrMore s ->
-    match e with
-    | Object o -> 
-      // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-      List.distinct ((select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o))
-    | List l ->
-      // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-      let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
-        (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
-      List.distinct ((select s e) @ (snd (List.fold helper (0, []) l)))
-    | _ -> select s e
+    select s e @ select (Sequence (s, (OneOrMore s))) e
+    // match e with
+    // | Object o -> 
+    //   // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+    //   (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
+    // | List l ->
+    //   // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+    //   let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
+    //     (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
+    //   (select s e) @ (snd (List.fold helper (0, []) l))
+    // | _ -> select s e
 
 
 

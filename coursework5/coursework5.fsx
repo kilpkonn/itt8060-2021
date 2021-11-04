@@ -517,7 +517,6 @@ let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option 
   | p :: ps -> Option.bind (map f ps) (mapPath f p e)
 
 
-
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
   let mapVal v = Some (match v with | Str s -> Str (sFn s) | Float n -> Float (nFn n) | _ -> v)
   let paths = List.map fst (select s e) |> List.distinct

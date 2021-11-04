@@ -443,16 +443,16 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->
     // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-    // select s e @ select (Sequence (s, (OneOrMore s))) e
-    match e with
-    | Object o -> 
-      (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
-    | Array l ->
-      // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-      let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
-        (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
-      (select s e) @ (snd (List.fold helper (0, []) l))
-    | _ -> select s e
+    select s e @ select (Sequence (s, (OneOrMore s))) e
+   //  match e with
+   //  | Object o -> 
+   //    (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
+   //  | Array l ->
+   //    // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+   //    let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
+   //      (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
+   //    (select s e) @ (snd (List.fold helper (0, []) l))
+   //  | _ -> select s e
 
 
 
@@ -480,20 +480,6 @@ let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("o
 let rec mapPath (f : Ecma -> Ecma option) (path : Path) (e : Ecma) : Ecma option =
   match path with
   | [] -> f e
-  // | [Key p] -> 
-  //   match e with
-  //   | Object o -> 
-  //     Object (List.fold (fun acc (n, v) -> 
-  //       if n = p then match f v with | Some v -> (n, v) :: acc | None -> acc
-  //       else (n, v) :: acc) [] o)
-  //   | _ -> Some e
-  // | [Index p] -> 
-  //   match e with
-  //   | List l -> 
-  //     List (snd (List.fold (fun (i, acc) v -> 
-  //       if i = p then (i+1, match f v with | Some v -> v :: acc | None -> acc) 
-  //       else (i+1, v :: acc)) (0, []) l))
-  //   | _ -> Some e
   | (Key p) :: ps ->
     match e with
     | Object o ->

@@ -430,7 +430,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     match e with
     | Object o -> 
       let selectHelper = fun (n, v) ->
-        let s1Res = select s1 v  // Or v, desc fucked up again
+        let s1Res = select s1 v  // Or e, desc fucked up again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
@@ -448,8 +448,13 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     | _ -> []
   | OneOrMore s ->
     match e with
-    | Object o -> (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select s v)) o)
-    | List l -> 
+    | Object o -> 
+      if l = [] then [] else failwith $"s: ${o.ToString()} e: ${e.ToString()}"
+
+      (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select s v)) o)
+    | List l ->
+      if l = [] then [] else failwith $"s: ${l.ToString()} e: ${e.ToString()}"
+
       let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = (i+1, (prefix (Index i) (select s v)) @ acc)
       (select s e) @ (snd (List.fold helper (0, []) l))
     | _ -> select s e

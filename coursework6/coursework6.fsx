@@ -52,7 +52,7 @@
 let pHoldsForAllSequentialElements (p : int -> int -> bool) (xs : int list) : bool =
   let rec helper acc p xs = match xs with
                             | x :: y :: [] -> acc && p x y
-                            | x :: y :: xs -> helper (acc && p x y) p xs 
+                            | x :: y :: xs -> if acc then helper (p x y) p xs else false 
                             | _ -> false
   helper true p xs
 

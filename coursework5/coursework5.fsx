@@ -439,7 +439,8 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       | v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
     List.collect helper s1Res
   | OneOrMore s ->
-    select s e @ select (Sequence (s, (OneOrMore s))) e
+    failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+    // select s e @ select (Sequence (s, (OneOrMore s))) e
     // match e with
     // | Object o -> 
     //   // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"

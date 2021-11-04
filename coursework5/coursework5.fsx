@@ -431,7 +431,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     | Object o -> 
       // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
       let selectHelper = fun (n, v) ->
-        let s1Res = select s1 e  // Or v, desc fucked up again
+        let s1Res = select s1 v  // Or v, desc fucked up again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
@@ -439,7 +439,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       List.collect selectHelper o
     | List l -> 
       let selectHelper = fun (i, acc) v ->
-        let s1Res = select s1 e  // Or v, desc fucked again
+        let s1Res = select s1 v  // Or v, desc fucked again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res

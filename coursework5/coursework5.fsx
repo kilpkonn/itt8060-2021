@@ -443,12 +443,12 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     match e with
     | Object o -> 
       // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-      (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
+      List.distinct ((select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o))
     | List l ->
       // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
       let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
         (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
-      (select s e) @ (snd (List.fold helper (0, []) l))
+      List.distinct ((select s e) @ (snd (List.fold helper (0, []) l)))
     | _ -> select s e
 
 

@@ -120,22 +120,33 @@ type 'a Tr =
   | Lf   of 'a
   | Br of 'a Tr * 'a Tr
 
-let rec merge (xs : int list) (ys : int list) : int list =
-  let rec insert acc v zs = match zs with
-                            | [] -> List.rev (v :: acc)
-                            | z::zs -> 
-                              if v > z then (List.rev acc) @ (v :: z :: zs)
-                              else insert (z :: acc) v zs
-  match xs with
-  | [] -> ys
-  | x :: xs -> merge xs (insert [] x ys)
+// let rec merge (xs : int list) (ys : int list) : int list =
+//   let rec insert acc v zs = match zs with
+//                             | [] -> List.rev (v :: acc)
+//                             | z::zs -> 
+//                               if v > z then (List.rev acc) @ (v :: z :: zs)
+//                               else insert (z :: acc) v zs
+//   match xs with
+//   | [] -> ys
+//   | x :: xs -> merge xs (insert [] x ys)
+
+// let medianAndAverageInTree (tree : int Tr) : (int * float) =
+//   let rec helper tree k : int list = match tree with
+//                                      | Lf x -> k [x]
+//                                      | Br (l, r) -> 
+//                                        helper l (fun ls -> helper r (fun rs -> k (ls @ rs)))
+//   let vs = helper tree id
+//   let avg = List.map float vs |> List.average
+//   let med = List.item ((List.length vs - 1) / 2) vs
+//   (med, avg)
+
 
 let medianAndAverageInTree (tree : int Tr) : (int * float) =
-  let rec helper tree k : int list = match tree with
-                                     | Lf x -> k [x]
-                                     | Br (l, r) -> 
-                                       helper l (fun ls -> helper r (fun rs -> k (ls @ rs)))
-  let vs = helper tree id
-  let avg = List.map float vs |> List.average
-  let med = List.item ((List.length vs - 1) / 2) vs
+  let rec helper tree k : (int * int * int list) = match tree with
+                                                   | Lf x -> k (1, x, [x])
+                                                   | Br (l, r) -> 
+                                                     helper l (fun (ln, lt, ls) -> helper r (fun (rn, rt, rs) -> k (ln+rn, lt+rt, ls @ rs)))
+  let (n, tot, lst) = helper tree id
+  let avg = float tot / float n
+  let med = List.item ((n - 1) / 2) lst
   (med, avg)

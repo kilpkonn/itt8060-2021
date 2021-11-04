@@ -28,7 +28,6 @@
   We will consider the submission to be the latest version of the appropriate
   files in the appropriate directory before the deadline of a particular
   coursework.
-
 *)
 
 (*

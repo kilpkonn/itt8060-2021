@@ -88,8 +88,14 @@ let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
   Make sure your implementation uses List.fold or List.foldBack appropriately.
   Test yourself if this implementation appears to be tail recursive.
 *)
-let createTwoTuplesOfListFold<'a> (x : 'a) (xs :'a list) : ('a * 'a) list =
-  List.foldBack (fun y acc -> (y, x) :: acc) xs []
+let createTwoTuplesOfListFold<'a> (z : 'a) (xs :'a list) : ('a * 'a) list =
+  let (c, res) = List.fold (fun (c, acc) y ->  match c with 
+                                               | Some v -> (None, (v, y) :: acc) 
+                                               | _ -> (Some y, acc)
+                                               ) (None, []) xs
+  match c with
+  | None -> List.rev res
+  | Some y -> (y, z) :: res |> List.rev
 
 
 (*

@@ -69,10 +69,11 @@ let pHoldsForAllSequentialElements (p : int -> int -> bool) (xs : int list) : bo
 *)
 // NOTE: 0 [1;2;3] -> [(1,0); (2,0); (3,0)] <- Don't think that's correct, someone needs to eat their words again...
 let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
+  let len = (List.length xs) % 2
   let rec helper acc z xs = match xs with
                             | [] -> List.rev acc
                             | x :: [] -> [(x, z)]
-                            | x :: y :: xs -> helper ((x, y) :: acc) x xs
+                            | x :: y :: xs -> helper ((x, if len = 0 then y else z) :: acc) x xs
   helper [] x xs
 
 

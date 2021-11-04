@@ -436,7 +436,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
       | List l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
-      | v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
+      | _ -> [] // v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->
@@ -444,7 +444,6 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     // select s e @ select (Sequence (s, (OneOrMore s))) e
     match e with
     | Object o -> 
-      // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
       (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
     | List l ->
       // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
@@ -517,6 +516,7 @@ let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
   let mapVal v = Some (match v with | String s -> String (sFn s) | Float n -> Float (nFn n) | _ -> v)
   let paths = List.map fst (select s e)
+  failwith $"s: ${s.ToString()} e: ${e.ToString()}"
   (map mapVal paths e).Value  // Very nice F#
 
 

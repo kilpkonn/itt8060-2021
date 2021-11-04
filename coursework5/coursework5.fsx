@@ -429,7 +429,6 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | Sequence (s1, s2) ->
     match e with
     | Object o -> 
-      // if o = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
       let selectHelper = fun (n, v) ->
         let s1Res = select s1 v  // Or v, desc fucked up again
         let doS2 = fun (path, ecma) ->
@@ -438,13 +437,14 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
         if s1Res <> [] then List.collect doS2 s1Res else []
       List.collect selectHelper o
     | List l -> 
-      let selectHelper = fun (i, acc) v ->
-        let s1Res = select s1 v  // Or v, desc fucked again
-        let doS2 = fun (path, ecma) ->
-          let s2Res = select s2 ecma
-          List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res
-        if s1Res <> [] then (i + 1, acc @ (List.collect doS2 s1Res)) else (i + 1, acc)
-      snd (List.fold selectHelper (0, []) l)
+      if l = [] then [] else failwith $"s: ${l.ToString()} e: ${e.ToString()}"
+     //  let selectHelper = fun (i, acc) v ->
+     //    let s1Res = select s1 v  // Or v, desc fucked again
+     //    let doS2 = fun (path, ecma) ->
+     //      let s2Res = select s2 ecma
+     //      List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res
+     //    if s1Res <> [] then (i + 1, acc @ (List.collect doS2 s1Res)) else (i + 1, acc)
+     //  snd (List.fold selectHelper (0, []) l)
     | _ -> []
   | OneOrMore s ->
     match e with

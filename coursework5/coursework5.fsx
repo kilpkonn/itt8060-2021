@@ -431,10 +431,10 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     if eval expr e then [([], e)] else []
   | Sequence (s1, s2) ->
     let s1Res = select s1 e
-    let helper (path, ecma) =
+    let helper (path, ecma) : (Path * Ecma) list =
       let doS2 n v : (Path * Ecma) list = List.map (fun (pth, ecm) -> (path @ (n :: pth), ecm)) (select s2 v)
       match ecma with
-      | Object o -> List.map (fun (n, v) -> doS2 (Key n) v) o
+      | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
       | List l -> 
         snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
       | _ -> []

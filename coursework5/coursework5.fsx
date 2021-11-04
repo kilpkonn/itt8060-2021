@@ -440,7 +440,6 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->
-    // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
     select s e @ select (Sequence (s, (OneOrMore s))) e
    //  match e with
    //  | Object o -> 
@@ -478,13 +477,14 @@ let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("o
 let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   match s with
   | Match expr ->
+    printfn $"${e.ToString()}"
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
-    let s1Res = select s1 e
-    let s2Res = 
+    let s1Res = select s1 e |> List.map fst
+    let doS2 paths  = 
       match e with
       | Object o -> 
-        List.foldBack (fun (n, v) acc -> 
+        List.foldBack (fun (n, v) acc -> // TODO: Map if path
           match map f s2 v with
           | Some v -> (n, v) :: acc
           | None -> acc
@@ -496,8 +496,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
           | None -> acc
         ) l [] |> Array |> Some
       | v -> Some e  // map f s2 v // Or no?
-    if s1Res = [] then Some e
-    else s2Res
+    doS2 s1Res
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->
     failwith $"s: ${s.ToString()} e: ${e.ToString()}"

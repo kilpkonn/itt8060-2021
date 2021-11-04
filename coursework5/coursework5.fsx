@@ -475,36 +475,63 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
 let su = Sequence (Sequence (Match True, Match True), Match True)
 let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("ok", Bool false)]); ("b", Object [("age", Str "middle"); ("height", Array [])]); ("a", Object [("age", Str "youngest"); ("height", Float 2.01); ("ok", Bool true)])]
 
-let rec mapPath (f : Ecma -> Ecma option) (path : Path) (e : Ecma) : Ecma option =
-  match path with
-  | [] -> f e
-  | (Key p) :: ps ->
-    match e with
-    | Object o ->
-      Object (List.map (fun (n, v) -> if n = p then (n, (mapPath f ps v)) else (n, Some v)) o
-      |> List.filter (fun v -> (snd v).IsSome)
-      |> List.map (fun (n, v) -> (n, v.Value))) |> Some
-    | _ -> Some e
-  | (Index p) :: ps ->
-    match e with
-    | Array l -> 
-      Array ((snd (List.fold (fun (i, acc) v -> 
-        if i = p then (i+1, (mapPath f ps v) :: acc)
-        else (i+1, (Some v) :: acc)) (0, []) l))
-      |> List.filter (fun v -> v.IsSome)
-      |> List.map (fun v -> v.Value)) |> Some
-    | _ -> Some e
+let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
+  match s with
+  | Match expr ->
+    if eval expr e then f e else Some e
+  | Sequence (s1, s2) ->
+    let s1Res = select s1 e
+    let s2Res = 
+      match e with
+      | Object o -> 
+        List.foldBack (fun (n, v) acc -> 
+          match map f s2 v with
+          | Some v -> (n, v) :: acc
+          | None -> acc
+        ) o [] |> Object |> Some  // NOTE: Who decided to flip order of arguments for foldBack ?!?
+      | Array l ->
+        List.foldBack (fun v acc ->
+          match map f s2 v with
+          | Some v -> v :: acc
+          | None -> acc
+        ) l [] |> Array |> Some
+      | v -> map f s2 v // Or no?
+    if s1Res = [] then Some e
+    else s2Res
+  | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
+  | OneOrMore s ->
+    // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+    Option.bind (map f (Sequence (s, (OneOrMore s)))) (f e)
 
-let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option =
-  match ps with
-  | [] -> Some e
-  | p :: ps -> Option.bind (map f ps) (mapPath f p e)
+  // match path with
+  // | [] -> f e
+  // | (Key p) :: ps ->
+  //   match e with
+  //   | Object o ->
+  //     Object (List.map (fun (n, v) -> if n = p then (n, (mapPath f ps v)) else (n, Some v)) o
+  //     |> List.filter (fun v -> (snd v).IsSome)
+  //     |> List.map (fun (n, v) -> (n, v.Value))) |> Some
+  //   | _ -> Some e
+  // | (Index p) :: ps ->
+  //   match e with
+  //   | Array l -> 
+  //     Array ((snd (List.fold (fun (i, acc) v -> 
+  //       if i = p then (i+1, (mapPath f ps v) :: acc)
+  //       else (i+1, (Some v) :: acc)) (0, []) l))
+  //     |> List.filter (fun v -> v.IsSome)
+  //     |> List.map (fun v -> v.Value)) |> Some
+  //   | _ -> Some e
+
+// let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option =
+//   match ps with
+//   | [] -> Some e
+//   | p :: ps -> Option.bind (map f ps) (mapPath f p e)
 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
   let mapVal v = Some (match v with | Str s -> Str (sFn s) | Float n -> Float (nFn n) | _ -> v)
-  let paths = List.map fst (select s e)
-  (map mapVal paths e).Value  // Very nice F#
+  // let paths = List.map fst (select s e)
+  (map mapVal s e).Value  // Very nice F#
 
 
 
@@ -522,8 +549,8 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
 // The result should be `None` when after the delete operation there
 // is no `Ecma` value left. Otherwise use `Some`.
 let delete (s : Selector) (e : Ecma) : Ecma option =
-  let paths = List.map fst (select s e)
-  map (fun _ -> None) paths e
+  // let paths = List.map fst (select s e)
+  map (fun _ -> None) s e
 
 
 

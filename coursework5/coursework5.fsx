@@ -436,10 +436,9 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
       | List l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
-      | _ -> []
+      | v -> [(path, ecma)]
     List.collect helper s1Res
   | OneOrMore s ->
-    failwith $"s: ${s.ToString()} e: ${e.ToString()}"
     select s e @ select (Sequence (s, (OneOrMore s))) e
     // match e with
     // | Object o -> 

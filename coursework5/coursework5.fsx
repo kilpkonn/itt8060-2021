@@ -500,7 +500,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     else s2Res
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->
-    // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+    failwith $"s: ${s.ToString()} e: ${e.ToString()}"
     Option.bind (map f (Sequence (s, (OneOrMore s)))) (f e)
 
   // match path with

@@ -449,7 +449,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | OneOrMore s ->
     match e with
     | Object o -> 
-      if l = [] then [] else failwith $"s: ${o.ToString()} e: ${e.ToString()}"
+      if o = [] then [] else failwith $"s: ${o.ToString()} e: ${e.ToString()}"
 
       (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select s v)) o)
     | List l ->

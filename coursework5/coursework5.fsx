@@ -419,7 +419,11 @@ let et2 =Object [
   ("a", Object [("age", String "oldest")]);
   ("b", Object [("age", String "middle")]);
   ("a", Object [("age", String "oldest")])
-] 
+]
+
+let st3 =  Sequence (Match (HasBoolValue false), Match True)
+let et3 = Object [("|H7\003H>`Vg 127", List [Bool false])]
+
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   let prefix p ps =  List.map (fun (a, b) -> (p :: a, b)) ps
   match s with
@@ -429,7 +433,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     match e with
     | Object o -> 
       let selectHelper = fun (n, v) ->
-        let s1Res = select s1 v  // Or e, desc fucked up again
+        let s1Res = select s1 e  // Or e, desc fucked up again
         let doS2 = fun (path, ecma) ->
           let s2Res = select s2 ecma
           List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
@@ -452,7 +456,8 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
     | List l ->
       // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-      let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
+      let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
+        (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
       (select s e) @ (snd (List.fold helper (0, []) l))
     | _ -> select s e
 

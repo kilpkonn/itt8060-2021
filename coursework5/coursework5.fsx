@@ -424,7 +424,8 @@ let et2 = Object [
 let st3 =  Sequence (Match (HasBoolValue false), Match True)
 let et3 = Object [("|H7\003H>`Vg 127", Array [Bool false])]
 
-let st4 = Sequence (Match (HasStringValue "\031A \003Hj`,q\019 U\026<2~ e[}I\014\004"), Match (HasBoolValue false))
+let st4 = Sequence (Match True, Match True)
+let et4 = Array [Array []; Float 1.154041161]
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   let prefix p ps =  List.map (fun (a, b) -> (p :: a, b)) ps
@@ -437,7 +438,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       let doS2 n v : (Path * Ecma) list = List.map (fun (pth, ecm) -> (path @ (n :: pth), ecm)) (select s2 v)
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
-      | Array l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
+      | Array l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l) |> List.rev
       | _ -> [] // v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e

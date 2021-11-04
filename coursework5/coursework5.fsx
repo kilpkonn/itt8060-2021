@@ -421,11 +421,8 @@ let et2 = Object [
   ("a", Object [("age", Str "oldest")])
 ]
 
-let st3 =  Sequence (Match (HasBoolValue false), Match True)
-let et3 = Object [("|H7\003H>`Vg 127", Array [Bool false])]
-
-let st4 = Sequence (Match True, Match True)
-let et4 = Array [Array []; Float 1.154041161]
+let st3 = Sequence (Match True, Match True)
+let et3 = Array [Array []; Float 1.154041161]
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   let prefix p ps =  List.map (fun (a, b) -> (p :: a, b)) ps
@@ -506,7 +503,7 @@ let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
   let mapVal v = Some (match v with | Str s -> Str (sFn s) | Float n -> Float (nFn n) | _ -> v)
-  let paths = List.map fst (select s e) |> List.distinct
+  let paths = List.map fst (select s e)
   (map mapVal paths e).Value  // Very nice F#
 
 

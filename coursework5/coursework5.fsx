@@ -495,7 +495,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
           | Some v -> v :: acc
           | None -> acc
         ) l [] |> Array |> Some
-      | v -> map f s2 v // Or no?
+      | v -> Some e  // map f s2 v // Or no?
     if s1Res = [] then Some e
     else s2Res
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e

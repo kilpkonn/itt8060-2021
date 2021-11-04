@@ -64,16 +64,15 @@ let pHoldsForAllSequentialElements (p : int -> int -> bool) (xs : int list) : bo
   that takes a list of 'a-s and returns a list of two element tuples of 'a-s that are taken
   sequentially from the list passed as the second argument to the function.
   In case the list has odd number of elements make the first argument of the
-  function be the second element in the tuple. 
+  function be the second element in the last tuple. 
   Make sure your implementation uses explicit tail recursion.
 *)
-// NOTE: 0 [1;2;3] -> [(1,0); (2,0); (3,0)] <- Don't think that's correct, someone needs to eat their words again...
+// NOTE: 0 [1;2;3] -> [(1,0); (2,0); (3,0)] || [(1, 2), (3, 0)]
 let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
-  let len = (List.length xs) % 2
   let rec helper acc z xs = match xs with
                             | [] -> List.rev acc
                             | x :: [] -> [(x, z)]
-                            | x :: y :: xs -> helper ((x, if len = 0 then y else z) :: acc) x xs
+                            | x :: y :: xs -> helper ((x, y) :: acc) x xs
   helper [] x xs
 
 
@@ -91,6 +90,10 @@ let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
 *)
 let createTwoTuplesOfListFold<'a> (x : 'a) (xs :'a list) : ('a * 'a) list =
   List.foldBack (fun y acc -> (y, x) :: acc) xs []
+
+  let fodlBack' f xs acc =
+    [] -> f acc
+    x :: xs -> f x (foldBack' xs acc)
 
 (*
   Task 4:

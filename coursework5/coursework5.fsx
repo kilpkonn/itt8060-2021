@@ -415,7 +415,7 @@ let et1 = Object [("a", Object [
   ("a", Object [("age", String "oldest")])
 ]
 let st2 = Match (Or (HasKey "a", Or (HasKey "age", HasStringValue "youngest")))
-let et2 =Object [
+let et2 = Object [
   ("a", Object [("age", String "oldest")]);
   ("b", Object [("age", String "middle")]);
   ("a", Object [("age", String "oldest")])
@@ -430,25 +430,15 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | Match expr ->
     if eval expr e then [([], e)] else []
   | Sequence (s1, s2) ->
-    match e with
-    | Object o -> 
-      let selectHelper = fun (n, v) ->
-        let s1Res = select s1 e  // Or e, desc fucked up again
-        let doS2 = fun (path, ecma) ->
-          let s2Res = select s2 ecma
-          List.map (fun (pth, ecm) -> ((Key n) :: (path @ pth), ecm)) s2Res
-        if s1Res <> [] then List.collect doS2 s1Res else []
-      List.collect selectHelper o
-    | List l -> 
-      if l = [] then [] else failwith $"s: ${l.ToString()} e: ${e.ToString()}"
-     //  let selectHelper = fun (i, acc) v ->
-     //    let s1Res = select s1 v  // Or v, desc fucked again
-     //    let doS2 = fun (path, ecma) ->
-     //      let s2Res = select s2 ecma
-     //      List.map (fun (pth, ecm) -> ((Index i) :: (path @ pth), ecm)) s2Res
-     //    if s1Res <> [] then (i + 1, acc @ (List.collect doS2 s1Res)) else (i + 1, acc)
-     //  snd (List.fold selectHelper (0, []) l)
-    | _ -> []
+    let s1Res = select s1 e
+    let helper (path, ecma) =
+      let doS2 n v : (Path * Ecma) list = List.map (fun (pth, ecm) -> (path @ (n :: pth), ecm)) (select s2 v)
+      match ecma with
+      | Object o -> List.map (fun (n, v) -> doS2 (Key n) v) o
+      | List l -> 
+        snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
+      | _ -> []
+    List.collect helper s1Res
   | OneOrMore s ->
     match e with
     | Object o -> 

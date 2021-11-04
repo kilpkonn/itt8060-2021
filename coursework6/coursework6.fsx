@@ -137,5 +137,5 @@ let medianAndAverageInTree (tree : int Tr) : (int * float) =
                                        helper l (fun ls -> helper r (fun rs -> k (ls @ rs)))
   let vs = helper tree id
   let avg = List.map float vs |> List.average
-  let med = List.item (List.length vs / 2) vs
+  let med = List.item ((List.length vs - 1) / 2) vs
   (med, avg)

@@ -71,8 +71,8 @@ let pHoldsForAllSequentialElements (p : int -> int -> bool) (xs : int list) : bo
 let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
   let rec helper acc z xs = match xs with
                             | [] -> List.rev acc
-                            | x :: [] -> [(x, z)]
-                            | x :: y :: xs -> helper ((x, y) :: acc) x xs
+                            | x :: [] -> (x, z) :: acc |> List.rev
+                            | x :: y :: xs -> helper ((x, y) :: acc) z xs
   helper [] x xs
 
 
@@ -91,9 +91,6 @@ let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
 let createTwoTuplesOfListFold<'a> (x : 'a) (xs :'a list) : ('a * 'a) list =
   List.foldBack (fun y acc -> (y, x) :: acc) xs []
 
-  let fodlBack' f xs acc =
-    [] -> f acc
-    x :: xs -> f x (foldBack' xs acc)
 
 (*
   Task 4:

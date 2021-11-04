@@ -62,8 +62,8 @@ type Ecma =
   | Object of (Name * Ecma) list
   | Float of float
   | Bool of bool
-  | String of string
-  | List of Ecma list
+  | Str of string
+  | Array of Ecma list
   | Null
 
 (*
@@ -105,7 +105,7 @@ Define the function
 that creates a representation for the given string value.
 *)
 
-let mkString (value: string) = String value
+let mkString (value: string) = Str value
 
 (*
 Define the function
@@ -116,7 +116,7 @@ that creates a representation for an array whose elements are
 represented by the given list of `Ecma` values.
 *)
 
-let mkArray (arr : Ecma list) = List arr
+let mkArray (arr : Ecma list) = Array arr
 
 (*
 Define the function
@@ -164,7 +164,7 @@ let addNameValue (name : string, value : Ecma) (obj : Ecma) =
 //   element, otherwise.
 let addValue (v : Ecma) (obj : Ecma) =
   match obj with
-  | List items -> List (items @ [v])
+  | Array items -> Array (items @ [v])
   | e -> e
 
 
@@ -342,27 +342,27 @@ let rec eval (expr : BExpr) (e : Ecma) : bool =
     match e with | Object o -> List.exists (fun (n, _) -> n = key) o | _ ->false
   | HasStringValue str ->
     match e with
-    | String s -> s = str
-    | Object o -> List.exists (fun (_, v) -> match v with | String s -> s = str | _ -> false) o
-    | List l -> List.exists (fun v -> match v with | String s -> s = str | _ -> false) l
+    | Str s -> s = str
+    | Object o -> List.exists (fun (_, v) -> match v with | Str s -> s = str | _ -> false) o
+    | Array l -> List.exists (fun v -> match v with | Str s -> s = str | _ -> false) l
     | _ -> false
   | HasNumericValueInRange (first, last) ->
     match e with
     | Float n -> first <= n && n <= last
     | Object o -> List.exists (fun (_, v) -> match v with | Float n -> first <= n && n <= last | _ -> false) o
-    | List l -> List.exists (fun v -> match v with | Float n -> first <= n && n <= last | _ -> false) l
+    | Array l -> List.exists (fun v -> match v with | Float n -> first <= n && n <= last | _ -> false) l
     | _ -> false
   | HasBoolValue v ->
     match e with
     | Bool b -> b = v
     | Object o -> List.exists (fun (_, x) -> match x with | Bool b -> b = v | _ -> false) o
-    | List l -> List.exists (fun x -> match x with | Bool b -> b = v | _ -> false) l
+    | Array l -> List.exists (fun x -> match x with | Bool b -> b = v | _ -> false) l
     | _ -> false
   | HasNull ->
     match e with
     | Null -> true
-    | Object o -> List.exists (fun (_, v) -> match v with | Null | Object _ | List _  -> true | _ -> false) o
-    | List l -> List.exists (fun v -> match v with | Null | Object _ | List _ -> true | _ -> false) l
+    | Object o -> List.exists (fun (_, v) -> match v with | Null | Object _ | Array _  -> true | _ -> false) o
+    | Array l -> List.exists (fun v -> match v with | Null | Object _ | Array _ -> true | _ -> false) l
     | _ -> false
 
 
@@ -401,28 +401,30 @@ type Path = Description list
 // values.
 let test = Object [
   ("abc", Bool false);
-  ("xs", List[
-    Object [("a", String "a")]; Float 1.0; Bool true;
-    Object [("b", String "b")]]);
-  ("xyz", Object [("a", Float 1.0); ("b", Object [("b", String "b")])]);
+  ("xs", Array[
+    Object [("a", Str "a")]; Float 1.0; Bool true;
+    Object [("b", Str "b")]]);
+  ("xyz", Object [("a", Float 1.0); ("b", Object [("b", Str "b")])]);
   ("ws", Bool false)
 ]
 
 let st1 = Sequence (Match True, Sequence (Match True, Match True))
 let et1 = Object [("a", Object [
-  ("age", String "oldest")]); 
-  ("b", Object [("age", String "middle")]);
-  ("a", Object [("age", String "oldest")])
+  ("age", Str "oldest")]); 
+  ("b", Object [("age", Str "middle")]);
+  ("a", Object [("age", Str "oldest")])
 ]
 let st2 = Match (Or (HasKey "a", Or (HasKey "age", HasStringValue "youngest")))
 let et2 = Object [
-  ("a", Object [("age", String "oldest")]);
-  ("b", Object [("age", String "middle")]);
-  ("a", Object [("age", String "oldest")])
+  ("a", Object [("age", Str "oldest")]);
+  ("b", Object [("age", Str "middle")]);
+  ("a", Object [("age", Str "oldest")])
 ]
 
 let st3 =  Sequence (Match (HasBoolValue false), Match True)
-let et3 = Object [("|H7\003H>`Vg 127", List [Bool false])]
+let et3 = Object [("|H7\003H>`Vg 127", Array [Bool false])]
+
+let st4 = Sequence (Match (HasStringValue "\031A \003Hj`,q\019 U\026<2~ e[}I\014\004"), Match (HasBoolValue false))
 
 let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   let prefix p ps =  List.map (fun (a, b) -> (p :: a, b)) ps
@@ -435,7 +437,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       let doS2 n v : (Path * Ecma) list = List.map (fun (pth, ecm) -> (path @ (n :: pth), ecm)) (select s2 v)
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
-      | List l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
+      | Array l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l)
       | _ -> [] // v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
@@ -445,7 +447,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     match e with
     | Object o -> 
       (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
-    | List l ->
+    | Array l ->
       // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"
       let helper (i : int, acc : (Path * Ecma) list) (v : Ecma) : int * ((Path * Ecma) list) = 
         (i+1, (prefix (Index i) (select (OneOrMore s) v)) @ acc)
@@ -471,6 +473,9 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
 // evaluates to an Ecma that is otherwise the same as e except that,
 // for the values selected by s, the string values and numeric values
 // of that value have been updated according to the functions su and nu.
+
+let su = Sequence (Sequence (Match True, Match True), Match True)
+let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("ok", Bool false)]); ("b", Object [("age", Str "middle"); ("height", Array [])]); ("a", Object [("age", Str "youngest"); ("height", Float 2.01); ("ok", Bool true)])]
 
 let rec mapPath (f : Ecma -> Ecma option) (path : Path) (e : Ecma) : Ecma option =
   match path with
@@ -498,8 +503,8 @@ let rec mapPath (f : Ecma -> Ecma option) (path : Path) (e : Ecma) : Ecma option
     | _ -> Some e
   | (Index p) :: ps ->
     match e with
-    | List l -> 
-      List ((snd (List.fold (fun (i, acc) v -> 
+    | Array l -> 
+      Array ((snd (List.fold (fun (i, acc) v -> 
         if i = p then (i+1, (mapPath f ps v) :: acc)
         else (i+1, (Some v) :: acc)) (0, []) l))
       |> List.filter (fun v -> v.IsSome)
@@ -514,9 +519,8 @@ let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option 
 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
-  let mapVal v = Some (match v with | String s -> String (sFn s) | Float n -> Float (nFn n) | _ -> v)
-  let paths = List.map fst (select s e)
-  failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+  let mapVal v = Some (match v with | Str s -> Str (sFn s) | Float n -> Float (nFn n) | _ -> v)
+  let paths = List.map fst (select s e) |> List.distinct
   (map mapVal paths e).Value  // Very nice F#
 
 

@@ -526,7 +526,7 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
   let rec mapVal v = match v with 
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
-                     | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
+                     | Object o -> List.map (fun (n, v) -> (n, mapVal (mapVal v))) o |> Object
                      | Array a -> List.map mapVal a |> List.map mapVal |> Array
                      | _ -> v
 

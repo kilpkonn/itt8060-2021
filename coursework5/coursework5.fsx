@@ -550,8 +550,8 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
   let rec mapVal v = match v with 
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
-                     | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
-                     | Array a -> List.map mapVal a |> Array
+                     // | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
+                     // | Array a -> List.map mapVal a |> Array
                      | _ -> v
 
   (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#

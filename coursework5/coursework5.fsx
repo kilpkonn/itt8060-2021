@@ -436,7 +436,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
       | Array l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l) |> List.rev
-      | _ -> [] // v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
+      | v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->

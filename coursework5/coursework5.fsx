@@ -477,7 +477,7 @@ let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("o
 let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   match s with
   | Match expr ->
-    printfn $"${e.ToString()}"
+    printfn $"${s.ToString()} ${e.ToString()}"
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
@@ -487,17 +487,21 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     let tail xs = match xs with _ :: xs -> xs | [] -> []
     let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
     let rec doS2 (paths : Path list) e =
-      let e = if List.contains [] paths then map f s2 e else Some e
+      printfn $"${paths.ToString()}"
       match e with
-      | Some (Object o) -> 
+      | Object o -> 
         List.foldBack (fun (n, v) acc ->
-          if not (correctKey n paths) then (n, v) :: acc
+          if List.contains [Key n] paths then
+            match map f s2 v with
+            | Some v -> (n, v) :: acc
+            | None -> acc
+          else if not (correctKey n paths) then (n, v) :: acc
           else
             match doS2 (filterPths (Key n) paths) v with
             | Some v -> (n, v) :: acc
             | None -> acc
         ) o [] |> Object |> Some  // NOTE: Who decided to flip order of arguments for foldBack ?!?
-      | Some (Array l) ->
+      | Array l ->
         List.fold (fun (i, acc) v ->
           if not (correctIdx i paths) then (i+1, v :: acc)
           else
@@ -505,8 +509,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
             | Some v -> (i+1, v :: acc)
             | None -> (i+1, acc)
         ) (0, []) l |> snd |> List.rev |> Array |> Some
-      | Some e -> Some e  // map f s2 v // Or no?
-      | None -> None
+      | e -> Some e  // map f s2 v // Or no?
     doS2 s1Res e
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->

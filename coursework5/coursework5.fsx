@@ -527,7 +527,7 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
                      | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
-                     | Array a -> List.map mapVal a |> Array
+                     | Array a -> List.map mapVal a |> List.map mapVal |> Array
                      | _ -> v
 
   (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#

@@ -481,22 +481,28 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
-    let doS2 paths  = 
+    let correctKey y xs = List.exists (fun xs -> match xs with | (Key x) :: _ -> x = y | _ -> false) xs 
+    let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | _ -> false) xs 
+    let doS2 (paths : Path list) e =
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc -> // TODO: Map if path
-          match map f s2 v with
-          | Some v -> (n, v) :: acc
-          | None -> acc
+          if not (correctKey n paths) then (n, v) :: acc
+          else
+            match map f s2 v with
+            | Some v -> (n, v) :: acc
+            | None -> acc
         ) o [] |> Object |> Some  // NOTE: Who decided to flip order of arguments for foldBack ?!?
       | Array l ->
-        List.foldBack (fun v acc ->
-          match map f s2 v with
-          | Some v -> v :: acc
-          | None -> acc
-        ) l [] |> Array |> Some
+        List.fold (fun (i, acc) v ->
+          if not (correctIdx i paths) then (i+1, v :: acc)
+          else
+            match map f s2 v with
+            | Some v -> (i+1, v :: acc)
+            | None -> (i+1, acc)
+        ) (0, []) l |> snd |> List.rev |> Array |> Some
       | v -> Some e  // map f s2 v // Or no?
-    doS2 s1Res
+    doS2 s1Res e
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->
     failwith $"s: ${s.ToString()} e: ${e.ToString()}"

@@ -436,7 +436,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
       match ecma with
       | Object o -> List.collect (fun (n, v) -> doS2 (Key n) v) o
       | Array l -> snd (List.fold (fun (i, acc) v -> (i+1, (doS2 (Index i) v) @ acc)) (0, []) l) |> List.rev
-      | v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
+      | _ -> [] // v -> List.map (fun (pth, ecm) ->  (path @ pth, ecm)) (select s2 v)
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->
@@ -542,9 +542,14 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
-  let mapVal v = Some (match v with | Str s -> Str (sFn s) | Float n -> Float (nFn n) | _ -> v)
+  let rec mapVal v = match v with 
+                     | Str s -> Str (sFn s) 
+                     | Float n -> Float (nFn n)
+                     | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
+                     | Array a -> List.map mapVal a |> Array
+                     | _ -> v
   // let paths = List.map fst (select s e)
-  (map mapVal s e).Value  // Very nice F#
+  (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#
 
 
 

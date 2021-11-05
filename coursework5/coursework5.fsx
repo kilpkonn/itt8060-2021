@@ -492,7 +492,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
-          if [] = paths then
+          if List.contains [Key n] paths then
             match map f s2 v with
             | Some v -> (n, v) :: acc
             | None -> acc
@@ -504,7 +504,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
         ) o [] |> Object |> Some  // NOTE: Who decided to flip order of arguments for foldBack ?!?
       | Array l ->
         List.fold (fun (i, acc) v ->
-          if [] = paths then
+          if List.contains [Index i] paths then
             match map f s2 v with
             | Some v -> (i+1, v::acc)
             | None -> (i+1, acc)
@@ -550,8 +550,8 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
   let rec mapVal v = match v with 
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
-                     // | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
-                     // | Array a -> List.map mapVal a |> Array
+                     | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
+                     | Array a -> List.map mapVal a |> Array
                      | _ -> v
 
   (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#

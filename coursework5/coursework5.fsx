@@ -482,26 +482,31 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
     let correctKey y xs = List.exists (fun xs -> match xs with | (Key x) :: _ -> x = y | _ -> false) xs 
-    let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | _ -> false) xs 
-    let doS2 (paths : Path list) e =
+    let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | _ -> false) xs
+    let head xs = match xs with | x :: _ -> Some x | _ -> None
+    let tail xs = match xs with _ :: xs -> xs | [] -> []
+    let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
+    let rec doS2 (paths : Path list) e =
+      let e = if List.contains [] paths then map f s2 e else Some e
       match e with
-      | Object o -> 
-        List.foldBack (fun (n, v) acc -> // TODO: Map if path
+      | Some (Object o) -> 
+        List.foldBack (fun (n, v) acc ->
           if not (correctKey n paths) then (n, v) :: acc
           else
-            match map f s2 v with
+            match doS2 (filterPths (Key n) paths) v with
             | Some v -> (n, v) :: acc
             | None -> acc
         ) o [] |> Object |> Some  // NOTE: Who decided to flip order of arguments for foldBack ?!?
-      | Array l ->
+      | Some (Array l) ->
         List.fold (fun (i, acc) v ->
           if not (correctIdx i paths) then (i+1, v :: acc)
           else
-            match map f s2 v with
+            match doS2 (filterPths (Index i) paths) v with
             | Some v -> (i+1, v :: acc)
             | None -> (i+1, acc)
         ) (0, []) l |> snd |> List.rev |> Array |> Some
-      | v -> Some e  // map f s2 v // Or no?
+      | Some e -> Some e  // map f s2 v // Or no?
+      | None -> None
     doS2 s1Res e
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->

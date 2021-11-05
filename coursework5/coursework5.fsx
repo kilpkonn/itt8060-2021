@@ -591,7 +591,11 @@ let de = Object [
 ]
 
 let delete (s : Selector) (e : Ecma) : Ecma option =
-  map (fun a -> printfn $"${a.ToString()}"; None) s e
+  let delFn = (fun v -> None)
+  let s = match s with
+          | Sequence (s1, s2) -> Sequence (Sequence (s1, s2), Match True)
+          | v -> v
+  map delFn s e
 
 
 

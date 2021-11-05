@@ -478,7 +478,7 @@ let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("o
 let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   match s with
   | Match expr ->
-    printfn $"${s.ToString()} ${e.ToString()}"
+    printfn $"Eval: ${e.ToString()}"
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
@@ -488,7 +488,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     let tail xs = match xs with _ :: xs -> xs | [] -> []
     let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
     let rec doS2 (paths : Path list) e =
-      printfn $"${paths.ToString()}"
+      printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
@@ -518,32 +518,8 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     doS2 s1Res e
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->
-    failwith $"s: ${s.ToString()} e: ${e.ToString()}"
+    // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
     Option.bind (map f (Sequence (s, (OneOrMore s)))) (f e)
-
-  // match path with
-  // | [] -> f e
-  // | (Key p) :: ps ->
-  //   match e with
-  //   | Object o ->
-  //     Object (List.map (fun (n, v) -> if n = p then (n, (mapPath f ps v)) else (n, Some v)) o
-  //     |> List.filter (fun v -> (snd v).IsSome)
-  //     |> List.map (fun (n, v) -> (n, v.Value))) |> Some
-  //   | _ -> Some e
-  // | (Index p) :: ps ->
-  //   match e with
-  //   | Array l -> 
-  //     Array ((snd (List.fold (fun (i, acc) v -> 
-  //       if i = p then (i+1, (mapPath f ps v) :: acc)
-  //       else (i+1, (Some v) :: acc)) (0, []) l))
-  //     |> List.filter (fun v -> v.IsSome)
-  //     |> List.map (fun v -> v.Value)) |> Some
-  //   | _ -> Some e
-
-// let rec map (f : Ecma -> Ecma option) (ps : Path list) (e : Ecma) : Ecma option =
-//   match ps with
-//   | [] -> Some e
-//   | p :: ps -> Option.bind (map f ps) (mapPath f p e)
 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
@@ -593,7 +569,7 @@ let de = Object [
 let delete (s : Selector) (e : Ecma) : Ecma option =
   let delFn = (fun v -> None)
   let s = match s with
-          | Sequence (s1, s2) -> Sequence (Sequence (s1, s2), Match True)
+          | Sequence (s1, s2) -> Sequence (Sequence (s1, Match True), s2)
           | v -> v
   map delFn s e
 

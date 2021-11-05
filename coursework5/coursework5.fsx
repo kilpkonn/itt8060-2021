@@ -550,7 +550,6 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
                      | Array a -> List.map mapVal a |> Array
                      | _ -> v
 
-  failwith $"s: ${s.ToString()} e: ${e.ToString()}"
   (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#
 
 
@@ -568,6 +567,10 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
 //
 // The result should be `None` when after the delete operation there
 // is no `Ecma` value left. Otherwise use `Some`.
+
+let ds = Sequence (Sequence (Match True, Match True), Match (Or (HasKey "ok", HasBoolValue false)))
+let de = Object [("a", Object [("age", Str "oldest"); ("ok", Bool false); ("height", Float 1.9)]); ("b", Object [("age", Str "middle"); ("height", Array [])]); ("a", Object [("age", Str "youngest"); ("height", Float 2.01); ("ok", Bool true)])]
+
 let delete (s : Selector) (e : Ecma) : Ecma option =
   failwith $"s: ${s.ToString()} e: ${e.ToString()}"
   map (fun _ -> None) s e

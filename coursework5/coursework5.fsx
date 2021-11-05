@@ -307,7 +307,7 @@ described by s : Selector as the set of values selected by s.
 // 
 // We consider the root value to be at depth 1.
 let b1 = And (And (HasKey "blue", HasKey "left"), Not(HasKey "red"))
-let b2 = HasNumericValueInRange (-5.0, 5.0) // And (Not (HasNumericValueInRange (5.0, 6.0)), HasNumericValueInRange (-5.0, 5.0))
+let b2 = And (Not HasNull, And (Not (HasNumericValueInRange (5.0, 6.0)), HasNumericValueInRange (-5.0, 5.0)))
 let b3 = Or (HasStringValue "b3", HasKey "b3")
 
 let s1 = Sequence (Match True, Sequence (Match True, Match (HasKey "abc")))
@@ -440,6 +440,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->
+    failwith $"s: ${s.ToString()} e: ${e.ToString()}"
     select s e @ select (Sequence (s, (OneOrMore s))) e
    //  match e with
    //  | Object o -> 
@@ -548,7 +549,6 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
                      | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
                      | Array a -> List.map mapVal a |> Array
                      | _ -> v
-  // let paths = List.map fst (select s e)
   (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#
 
 
@@ -567,7 +567,6 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
 // The result should be `None` when after the delete operation there
 // is no `Ecma` value left. Otherwise use `Some`.
 let delete (s : Selector) (e : Ecma) : Ecma option =
-  // let paths = List.map fst (select s e)
   map (fun _ -> None) s e
 
 

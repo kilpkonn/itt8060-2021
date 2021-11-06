@@ -492,25 +492,25 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
-          if List.contains [Key n] paths then
+          if List.contains [] paths then
             match map f s2 v with
             | Some v -> (n, v) :: acc
             | None -> acc
           else if not (correctKey n paths) then (n, v) :: acc
           else
-            match doS2 (filterPths (Key n) paths) v with
+            match doS2 (tail (filterPths (Key n) paths)) v with
             | Some v -> (n, v) :: acc
             | None -> acc
         ) o [] |> Object |> Some  // NOTE: Who decided to flip order of arguments for foldBack ?!?
       | Array l ->
         List.fold (fun (i, acc) v ->
-          if List.contains [Index i] paths then
+          if List.contains [] paths then
             match map f s2 v with
             | Some v -> (i+1, v::acc)
             | None -> (i+1, acc)
           else if not (correctIdx i paths) then (i+1, v :: acc)
           else
-            match doS2 (filterPths (Index i) paths) v with
+            match doS2 (tail (filterPths (Index i) paths)) v with
             | Some v -> (i+1, v :: acc)
             | None -> (i+1, acc)
         ) (0, []) l |> snd |> List.rev |> Array |> Some

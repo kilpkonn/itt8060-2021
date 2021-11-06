@@ -486,7 +486,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | _ -> false) xs
     let head xs = match xs with | x :: _ -> Some x | _ -> None
     let tail xs = match xs with _ :: xs -> xs | [] -> []
-    let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> true)
+    let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
     let rec doS2 (paths : Path list) e =
       printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
       match e with

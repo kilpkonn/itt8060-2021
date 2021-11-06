@@ -505,7 +505,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Array l ->
         List.fold (fun (i, acc) v ->
           if List.contains [Index i] paths then
-            match map f s2 v with
+            match Option.bind (map f s2) (map f s2 v) with
             | Some v -> (i+1, v::acc)
             | None -> (i+1, acc)
           else if not (correctIdx i paths) then (i+1, v :: acc)

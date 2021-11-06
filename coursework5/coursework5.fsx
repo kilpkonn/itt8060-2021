@@ -493,7 +493,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
           if List.contains [Key n] paths then
-            match map f s2 v with
+            match Option.bind (map f s2) (map f s2 v) with
             | Some v -> (n, v) :: acc
             | None -> acc
           else if not (correctKey n paths) then (n, v) :: acc

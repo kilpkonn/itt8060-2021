@@ -493,7 +493,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
           if List.contains [] paths then
-            match Option.bind (doS2 (tail paths)) (map f s2 v) with
+            match Option.bind (doS2 (tail (filterPths (Key n) paths))) (map f s2 v) with
             | Some v -> (n, v) :: acc
             | None -> acc
           else if not (correctKey n paths) then (n, v) :: acc
@@ -505,7 +505,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Array l ->
         List.fold (fun (i, acc) v ->
           if List.contains [] paths then
-            match Option.bind (doS2 (tail paths)) (map f s2 v) with
+            match Option.bind (doS2 (tail (filterPths (Index i) paths))) (map f s2 v) with
             | Some v -> (i+1, v::acc)
             | None -> (i+1, acc)
           else if not (correctIdx i paths) then (i+1, v :: acc)

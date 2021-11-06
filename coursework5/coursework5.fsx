@@ -493,7 +493,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
           if List.contains [Key n] paths then
-            match Option.bind (map f s2) (map f s2 v) with
+            match map f s2 v with
             | Some v -> (n, v) :: acc
             | None -> acc
           else if not (correctKey n paths) then (n, v) :: acc
@@ -505,7 +505,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Array l ->
         List.fold (fun (i, acc) v ->
           if List.contains [Index i] paths then
-            match Option.bind (map f s2) (map f s2 v) with
+            match map f s2 v with
             | Some v -> (i+1, v::acc)
             | None -> (i+1, acc)
           else if not (correctIdx i paths) then (i+1, v :: acc)
@@ -568,9 +568,9 @@ let de = Object [
 
 let delete (s : Selector) (e : Ecma) : Ecma option =
   let delFn = (fun v -> None)
-  let s = match s with
-          | Sequence (s1, s2) -> Sequence (Sequence (s1, Match True), s2)
-          | v -> v
+  // let s = match s with
+  //         | Sequence (s1, s2) -> Sequence (Sequence (s1, Match True), s2)
+  //         | v -> v
   map delFn s e
 
 

@@ -478,7 +478,7 @@ let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("o
 let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   match s with
   | Match expr ->
-    printfn $"Eval: ${e.ToString()}"
+    // printfn $"Eval: ${e.ToString()}"
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
@@ -489,7 +489,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     let tailAll = List.map tail
     let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
     let rec doS2 (paths : Path list) e =
-      printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
+      // printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc ->

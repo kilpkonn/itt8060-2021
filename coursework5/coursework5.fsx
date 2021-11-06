@@ -307,7 +307,7 @@ described by s : Selector as the set of values selected by s.
 // 
 // We consider the root value to be at depth 1.
 let b1 = And (And (HasKey "blue", HasKey "left"), Not(HasKey "red"))
-let b2 = And (Not (HasNumericValueInRange (4.0, 4.0)), And (Not (HasNumericValueInRange (5.0, 6.0)), HasNumericValueInRange (-5.0, 5.0)))
+let b2 = And (Not (HasNumericValueInRange (5.0, 5.0)), HasNumericValueInRange (-5.0, 5.0))
 let b3 = Or (HasStringValue "b3", HasKey "b3")
 
 let s1 = Sequence (Match True, Sequence (Match True, Match (HasKey "abc")))
@@ -526,8 +526,8 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
   let rec mapVal v = match v with 
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
-                     | Object o -> List.map (fun (n, v) -> (n, mapVal (mapVal v))) o |> Object
-                     | Array a -> List.map mapVal a |> List.map mapVal |> Array
+                     | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
+                     | Array a -> List.map (mapVal << mapVal) a |> Array
                      | _ -> v
 
   (map (fun v -> mapVal v |> Some) s e).Value  // Very nice F#

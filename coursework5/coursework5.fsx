@@ -486,14 +486,14 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | _ -> false) xs
     let head xs = match xs with | x :: _ -> Some x | _ -> None
     let tail xs = match xs with _ :: xs -> xs | [] -> []
-    let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
+    let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> true)
     let rec doS2 (paths : Path list) e =
       printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
           if List.contains [Key n] paths then
-            match Option.bind (map f s2) (map f s2 v) with
+            match map f s2 v with
             | Some v -> (n, v) :: acc
             | None -> acc
           else if not (correctKey n paths) then (n, v) :: acc
@@ -505,7 +505,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
       | Array l ->
         List.fold (fun (i, acc) v ->
           if List.contains [Index i] paths then
-            match Option.bind (map f s2) (map f s2 v) with
+            match map f s2 v with
             | Some v -> (i+1, v::acc)
             | None -> (i+1, acc)
           else if not (correctIdx i paths) then (i+1, v :: acc)

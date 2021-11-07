@@ -568,7 +568,7 @@ let de = Object [
 ]
 
 let delete (s : Selector) (e : Ecma) : Ecma option =
-  let delFn = (fun v -> match v with Array _ -> Some (Array []) | _ -> None)
+  let delFn = (fun v -> None)
   // let s = match s with
   //        | Sequence (s1, s2) -> Sequence (Sequence (s1, Match True), s2)
   //        | v -> v

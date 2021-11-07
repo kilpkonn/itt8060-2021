@@ -475,10 +475,15 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
 let su = Sequence (Sequence (Match True, Match True), Match True)
 let eu = Object [("a", Object [("age", Str "oldest"); ("height", Float 1.9); ("ok", Bool false)]); ("b", Object [("age", Str "middle"); ("height", Array [])]); ("a", Object [("age", Str "youngest"); ("height", Float 2.01); ("ok", Bool true)])]
 
+let su2 = Match (HasKey " ,q=3U")
+let eu2 = Object [
+  (" ,q=3U", Object [("3)u:\R", Float -1.038539229)])
+]  
+
 let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   match s with
   | Match expr ->
-    // printfn $"Eval: ${e.ToString()}"
+    printfn $"Eval: ${e.ToString()}"
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
@@ -489,7 +494,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     let tailAll = List.map tail
     let filterPths n = List.filter (fun ys -> match ys with | y :: ys -> n = y | _ -> false)
     let rec doS2 (paths : Path list) e =
-      // printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
+      printfn $"pth: ${paths.ToString()}, s: ${s.ToString()}"
       match e with
       | Object o -> 
         List.foldBack (fun (n, v) acc ->
@@ -524,7 +529,11 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =
-  let rec mapVal v = match v with 
+  let mapVal v = match v with 
+                     | Str s -> Str (sFn s) 
+                     | Float n -> Float (nFn n)
+                     | _ -> v
+  let mapVal v = match v with 
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
                      | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object

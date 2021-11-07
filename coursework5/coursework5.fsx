@@ -440,7 +440,6 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
     List.collect helper s1Res
   | OneOrMore (OneOrMore s) -> select (OneOrMore s) e
   | OneOrMore s ->
-    // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
     select s e @ select (Sequence (s, (OneOrMore s))) e
    //  match e with
    //  | Object o -> 
@@ -619,6 +618,7 @@ let toZero (n : float) (s : Selector) (e : Ecma) : Ecma =
 
 let truncate (n : int) (s : Selector) (e : Ecma) : Ecma =
   update (fun v -> if v = null || v.Length < n then v else v.Substring(0, n)) id s e
+  // BUG:               ^ very good usage of types I see >:D
 
 
 

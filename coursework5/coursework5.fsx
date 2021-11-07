@@ -361,8 +361,8 @@ let rec eval (expr : BExpr) (e : Ecma) : bool =
   | HasNull ->
     match e with
     | Null -> true
-    | Object o -> List.exists (fun (_, v) -> match v with | Null | Object _ | Array _  -> true | _ -> false) o
-    | Array l -> List.exists (fun v -> match v with | Null | Object _ | Array _ -> true | _ -> false) l
+    | Object o -> List.exists (fun (_, v) -> match v with | Object [] | Array [] -> false | Null | Object _ | Array _  -> true | _ -> false) o
+    | Array l -> List.exists (fun v -> match v with Object [] | Array [] -> false | Null | Object _ | Array _ -> true | _ -> false) l
     | _ -> false
 
 

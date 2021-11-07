@@ -482,8 +482,8 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
     if eval expr e then f e else Some e
   | Sequence (s1, s2) ->
     let s1Res = select s1 e |> List.map fst
-    let correctKey y xs = List.exists (fun xs -> match xs with | (Key x) :: _ -> x = y | _ -> false) xs 
-    let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | _ -> false) xs
+    let correctKey y xs = List.exists (fun xs -> match xs with | (Key x) :: _ -> x = y | [] -> true |  _ -> false) xs 
+    let correctIdx y xs = List.exists (fun xs -> match xs with | (Index x) :: _ -> x = y | [] -> true |  _ -> false) xs
     let head xs = match xs with | x :: _ -> Some x | _ -> None
     let tail xs = match xs with _ :: xs -> xs | [] -> []
     let tailAll = List.map tail
@@ -527,7 +527,7 @@ let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : E
   let rec mapVal v = match v with 
                      | Str s -> Str (sFn s) 
                      | Float n -> Float (nFn n)
-                     | Object o -> List.map (fun (n, v) -> (n, v)) o |> Object
+                     | Object o -> List.map (fun (n, v) -> (n, mapVal v)) o |> Object
                      | Array a -> List.map (mapVal) a |> Array
                      | _ -> v
 

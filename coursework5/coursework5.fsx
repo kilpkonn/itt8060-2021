@@ -525,7 +525,7 @@ let rec map (f : Ecma -> Ecma option) (s : Selector) (e : Ecma) : Ecma option =
   | OneOrMore (OneOrMore s) -> map f (OneOrMore s) e
   | OneOrMore s ->
     // failwith $"s: ${s.ToString()} e: ${e.ToString()}"
-    Option.bind (map f (Sequence (s, (OneOrMore s)))) (f e)
+    map f (Sequence (s, (OneOrMore s))) e
 
 
 let update (sFn : string -> string) (nFn : float -> float) (s : Selector) (e : Ecma) : Ecma =

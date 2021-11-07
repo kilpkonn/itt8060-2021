@@ -618,7 +618,7 @@ let toZero (n : float) (s : Selector) (e : Ecma) : Ecma =
   update id (fun v -> if abs v < n then 0.0 else v) s e  // Or Sequence(s, HasNumericValueInRange(-n, n))
 
 let truncate (n : int) (s : Selector) (e : Ecma) : Ecma =
-  update (fun v -> if v.Length < n then v else v.Substring(0, n)) id s e
+  update (fun v -> if v = null || v.Length < n then v else v.Substring(0, n)) id s e
 
 
 

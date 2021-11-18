@@ -146,7 +146,8 @@ let wfTrees : Gen<FsTree> =
       gen {
         let! n = Arb.Default.NonEmptyString().Generator
         let! i = Gen.choose (1, 4)
-        let c = Gen.sample 1 5 (wfTree (k - i))
+        let! w = Gen.choose (k / 2 + 1, k)
+        let c = Gen.sample 1 w (wfTree (k - i))
         return { name = string n; children = c}
       }
   Gen.sized wfTree
@@ -155,7 +156,7 @@ let wfTrees : Gen<FsTree> =
 let wfPaths : Gen<Path> = 
   let rec wfPath k =
     gen {
-      let! p = Arb.Default.List<string>().Generator
+      let! p = Arb.Default.NonEmptyString().Generator
       let! ps = wfPath (k - 1)
       return if k <= 0 then [string p] else (string p) :: ps
     }

@@ -145,14 +145,13 @@ let randStr =
 let wfTrees : Gen<FsTree> =
   let rec wfTree (k : int) : Gen<FsTree> =
     match k with
-    | 0 -> gen {
+    | n when n <= 0 -> gen {
         let! n = randStr 
         return { name = n; children = [] }
       }
     | _ ->
       gen {
         let! i = Gen.choose (1, 4)
-        let! w = Gen.choose (k / 2 + 1, k)
         let! names = Gen.listOf randStr
         let names = names |> set |> Set.toList
         let! ts = wfTree (k - i) |> Gen.listOfLength (List.length names)

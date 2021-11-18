@@ -143,23 +143,18 @@ let randStr =
 
 
 let wfTrees : Gen<FsTree> =
-  let rec wfTree (k : int) : Gen<FsTree> =
+  let rec wfTree (n : string) (k : int) : Gen<FsTree> =
     match k with
-    | n when n <= 0 -> gen {
-        let! n = randStr 
-        return { name = n; children = [] }
-      }
+    | m when m <= 0 -> Gen.constant { name = n; children = [] }
     | _ ->
       gen {
         let! i = Gen.choose (1, 4)
         let! names = Gen.listOf randStr
         let names = names |> set |> Set.toList
-        let! ts = wfTree (k - i) |> Gen.listOfLength (List.length names)
-        let c = List.zip names ts |> List.map (fun (n, t) -> { name = n; children = t.children })
-        let! n = randStr
+        let c = names |> List.map (fun m -> { name = n; children = (Gen.sample (k/2) i (wfTree m (k / 2))) })
         return { name = n; children = c}
       }
-  Gen.sized wfTree
+  Gen.sized (wfTree "root")
 
 
 let wfPaths : Gen<Path> = 

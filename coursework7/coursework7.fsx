@@ -103,9 +103,7 @@ let pathWf (p : Path) : bool =
    property? Depends on depth and width but big
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
-  (pathWf p && fsTreeWf t) ==>
-    failwith $"${p}  ||  ${t}"
-    // (create p t |> fsTreeWf)
+  (pathWf p && fsTreeWf t) ==> (FileSystem.create p t |> fsTreeWf)
 
 
 

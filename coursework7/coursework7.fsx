@@ -151,7 +151,7 @@ let wfTrees : Gen<FsTree> =
       gen {
         let! i = Gen.choose (1, 5)
         let names = Gen.sample 1 (k / i) randStr |> set |> Set.toList
-        let c = names |> List.collect (fun m -> Gen.constant (wfTree m (k / 3)))
+        let c = names |> List.collect (fun m -> Gen.sample 1 1 (wfTree m (k / 3)))
         return { name = n; children = c}
       }
   Gen.sized (wfTree "root")

@@ -144,7 +144,6 @@ let randStr =
 
 let wfTrees : Gen<FsTree> =
   let rec wfTree (n : string) (k : int) : Gen<FsTree> =
-    printfn $"name ${n}"
     match k with
     | m when m <= 0 -> Gen.constant { name = n; children = [] }
     | _ ->

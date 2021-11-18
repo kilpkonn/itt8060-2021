@@ -135,9 +135,29 @@ let createIsWf (p : Path) (t : FsTree) : Property =
    generators indeed only generate well-formed data. Or that the
    predicates are defined correctly.
 *)
-let wfTrees : Gen<FsTree> = failwith "todo"
+let wfTrees : Gen<FsTree> =
+  let rec wfTree s : Gen<FsTree> =
+    match s with
+    | 0 -> gen {
+        let! n = Arb.Default.NonEmptyString().Generator
+        return { name = string n; children = [] }
+      }
+    | n ->
+      gen {
+        let! n = Arb.Default.NonEmptyString().Generator
+        return { name = string n; children = []}
+      }
+  Gen.sized wfTree
 
-let wfPaths : Gen<Path> = failwith "todo"
+
+let wfPaths : Gen<Path> = 
+  let rec wfPath k =
+    gen {
+      let! p = Arb.Default.List<string>().Generator
+      let! ps = wfPath (k - 1)
+      return if k <= 0 then [string p] else (string p) :: ps
+    }
+  Gen.sized wfPath
 
 
 

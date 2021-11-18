@@ -135,32 +135,36 @@ let createIsWf (p : Path) (t : FsTree) : Property =
    generators indeed only generate well-formed data. Or that the
    predicates are defined correctly.
 *)
+let randStr =
+  "qwertyuiopasdfghjklzxcvbnm,.;:_-+0123456789".ToCharArray()
+      |> Gen.elements
+      |> Gen.nonEmptyListOf
+      |> Gen.map (List.toArray >> System.String)
+
+
 let wfTrees : Gen<FsTree> =
-  let rec wfTree k : Gen<FsTree> =
+  let rec wfTree (k : int) : Gen<FsTree> =
     match k with
     | 0 -> gen {
-        let! n = Arb.Default.NonEmptyString().Generator
-        return { name = string n; children = [] }
+        let! n = randStr 
+        return { name = n; children = [] }
       }
     | _ ->
       gen {
-        let! n = Arb.Default.NonEmptyString().Generator
         let! i = Gen.choose (1, 4)
         let! w = Gen.choose (k / 2 + 1, k)
-        let c = Gen.sample 1 w (wfTree (k - i))
-        return { name = string n; children = c}
+        let! names = Gen.listOf randStr
+        let names = names |> set |> Set.toList
+        let! ts = wfTree (k - i) |> Gen.listOfLength (List.length names)
+        let c = List.zip names ts |> List.map (fun (n, t) -> { name = n; children = t.children })
+        let! n = randStr
+        return { name = n; children = c}
       }
   Gen.sized wfTree
 
 
 let wfPaths : Gen<Path> = 
-  let rec wfPath k =
-    gen {
-      let! p = Arb.Default.NonEmptyString().Generator
-      let! ps = wfPath (k - 1)
-      return if k <= 0 then [string p] else (string p) :: ps
-    }
-  Gen.sized wfPath
+  Gen.listOf randStr
 
 
 

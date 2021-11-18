@@ -441,7 +441,7 @@ let rec select (s : Selector) (e : Ecma) : (Path * Ecma) list =
   | OneOrMore s ->
     select s e @ select (Sequence (s, (OneOrMore s))) e
    //  match e with
-   //  | Object o -> 
+   //  | Object o -> NOTE: o s s o
    //    (select s e) @ (List.collect (fun (n, v) -> prefix (Key n) (select (OneOrMore s) v)) o)
    //  | Array l ->
    //    // if l = [] then [] else failwith $"s: ${s.ToString()} e: ${e.ToString()}"

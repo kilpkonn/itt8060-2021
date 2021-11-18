@@ -68,7 +68,7 @@ let pHoldsForAllSequentialElements (p : int -> int -> bool) (xs : int list) : bo
   Make sure your implementation uses explicit tail recursion.
 *)
 // NOTE: 0 [1;2;3] -> [(1,0); (2,0); (3,0)] || [(1, 2), (3, 0)]
-let createTwoTuplesOfList<'a> (x :'a) (xs : 'a list) : ('a * 'a) list =
+let createTwoTuplesOfList (x :'a) (xs : 'a list) : ('a * 'a) list =
   let rec helper acc z xs = match xs with
                             | [] -> List.rev acc
                             | x :: [] -> (x, z) :: acc |> List.rev

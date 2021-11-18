@@ -72,9 +72,16 @@ open FileSystem
    Define these predicates so that they traverse their input only
    once.
 *)
-let fsTreeWf (t : FsTree) : bool = true
+let rec fsTreeWf (t : FsTree) : bool =
+  let { name = n; children = c } = t
+  let subdirs = children |> List.map (fun v -> v.name)
+  let currOk = List.distinct subdirs = subdirs && name <> ""
+  let childOk = List.fold (fun acc ct -> acc && fsTreeWf ct) true children
+  currOk && childOk
 
-let pathWf (p : Path) : bool = true
+
+let pathWf (p : Path) : bool =
+  not (List.contains "" p)
 
 
 

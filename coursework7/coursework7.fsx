@@ -149,7 +149,7 @@ let wfTrees : Gen<FsTree> =
     | _ ->
       gen {
         let! i = Gen.choose (1, 3)
-        let names = Gen.sample 1 (k / i) randStr |> set |> Set.toList
+        let names = Gen.sample 1 (2 * k / i) randStr |> set |> Set.toList
         let c = names |> List.collect (fun m -> Gen.sample 1 1 (wfTree m (k / 3)))
         return { name = n; children = c}
       }

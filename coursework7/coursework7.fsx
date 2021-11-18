@@ -74,13 +74,13 @@ open FileSystem
 *)
 let rec fsTreeWf (t : FsTree) : bool =
   let subdirs = t.children |> List.map (fun v -> v.name)
-  let currOk = List.distinct subdirs = subdirs && t.name <> ""
+  let currOk = List.length (List.distinct subdirs) = (List.length subdirs) && t.name.Length > 0
   let childOk = List.forall fsTreeWf t.children
   currOk && childOk
 
 
 let pathWf (p : Path) : bool =
-  p <> [] && not (List.contains "" p)
+  p <> [] && List.forall (fun v -> v.Length > 0) p
 
 
 

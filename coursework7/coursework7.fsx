@@ -104,7 +104,7 @@ let pathWf (p : Path) : bool =
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
   (pathWf p && fsTreeWf t) ==> 
-    Prop.classify (create p t |> fsTreeWf) "create on well formated fails"
+    (create p t |> fsTreeWf)
 
 
 

@@ -73,10 +73,9 @@ open FileSystem
    once.
 *)
 let rec fsTreeWf (t : FsTree) : bool =
-  let { name = n; children = c } = t
-  let subdirs = children |> List.map (fun v -> v.name)
-  let currOk = List.distinct subdirs = subdirs && name <> ""
-  let childOk = List.fold (fun acc ct -> acc && fsTreeWf ct) true children
+  let subdirs = t.children |> List.map (fun v -> v.name)
+  let currOk = List.distinct subdirs = subdirs && t.name <> ""
+  let childOk = List.fold (fun acc ct -> acc && fsTreeWf ct) true t.children
   currOk && childOk
 
 

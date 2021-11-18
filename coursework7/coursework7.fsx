@@ -148,8 +148,8 @@ let wfTrees : Gen<FsTree> =
     | m when m <= 0 -> Gen.constant { name = n; children = [] }
     | _ ->
       gen {
-        let! i = Gen.choose (1, 2 * k)
-        let names = Gen.sample 2 i randStr |> set |> Set.toList
+        let! i = Gen.choose (1, k)
+        let names = Gen.sample (i/10) i randStr |> set |> Set.toList
         let c = names |> List.collect (fun m -> Gen.sample 1 1 (wfTree m (k / 3)))
         return { name = n; children = c}
       }

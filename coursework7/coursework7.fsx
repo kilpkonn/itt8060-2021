@@ -136,16 +136,18 @@ let createIsWf (p : Path) (t : FsTree) : Property =
    predicates are defined correctly.
 *)
 let wfTrees : Gen<FsTree> =
-  let rec wfTree s : Gen<FsTree> =
-    match s with
+  let rec wfTree k : Gen<FsTree> =
+    match k with
     | 0 -> gen {
         let! n = Arb.Default.NonEmptyString().Generator
         return { name = string n; children = [] }
       }
-    | n ->
+    | _ ->
       gen {
         let! n = Arb.Default.NonEmptyString().Generator
-        return { name = string n; children = []}
+        let! i = Gen.choose (1, 4)
+        let c = Gen.sample 1 5 (wfTree (k - i))
+        return { name = string n; children = c}
       }
   Gen.sized wfTree
 

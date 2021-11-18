@@ -80,7 +80,7 @@ let rec fsTreeWf (t : FsTree) : bool =
 
 
 let pathWf (p : Path) : bool =
-  not (List.contains "" p)
+  p <> [] && not (List.contains "" p)
 
 
 
@@ -97,13 +97,14 @@ let pathWf (p : Path) : bool =
 
    Define this using a conditional property (==>).
 
-   Is this a good way to check such a property? Why?
+   Is this a good way to check such a property? Why? No, overhead
 
    What percentage of the generated test inputs trivially satisfy this
-   property?
+   property? Depends on depth and width but big
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
-  failwith "todo"
+  (pathWf p && fsTreeWf t) ==> 
+    Prop.classify (create p t |> fsTreeWf) "create on well formated fails"
 
 
 

@@ -80,7 +80,7 @@ let rec fsTreeWf (t : FsTree) : bool =
 
 
 let pathWf (p : Path) : bool =
-  p <> [] && List.forall (fun v -> v.Length > 0) p
+  p <> [] && List.forall (fun (v : string) -> v.Length > 0) p
 
 
 

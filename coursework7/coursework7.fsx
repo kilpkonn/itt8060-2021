@@ -8,8 +8,8 @@
   Coursework 7: property-based testing
 
   ------------------------------------
-  Name:
-  Student ID:
+  Name: Tavo Annus
+  Student ID: taannu
   ------------------------------------
 
 

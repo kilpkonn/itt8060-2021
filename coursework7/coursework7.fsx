@@ -103,7 +103,7 @@ let pathWf (p : Path) : bool =
    property? Depends on depth and width but big
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
-  (pathWf p && fsTreeWf t && (List.head p) = t.name) ==> 
+  (pathWf p && fsTreeWf t ==> 
     (create p t |> fsTreeWf)
 
 

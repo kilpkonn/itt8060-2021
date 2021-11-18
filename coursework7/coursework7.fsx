@@ -72,9 +72,9 @@ open FileSystem
    Define these predicates so that they traverse their input only
    once.
 *)
-fsTreeWf (t : FsTree) : bool = true
+let fsTreeWf (t : FsTree) : bool = true
 
-pathWf (p : Path) : bool = true
+let pathWf (p : Path) : bool = true
 
 
 
@@ -96,7 +96,7 @@ pathWf (p : Path) : bool = true
    What percentage of the generated test inputs trivially satisfy this
    property?
 *)
-createIsWf (p : Path) (t : FsTree) : Property =
+let createIsWf (p : Path) (t : FsTree) : Property =
   failwith "todo"
 
 
@@ -129,9 +129,9 @@ createIsWf (p : Path) (t : FsTree) : Property =
    generators indeed only generate well-formed data. Or that the
    predicates are defined correctly.
 *)
-wfTrees : Gen<FsTree> = failwith "todo"
+let wfTrees : Gen<FsTree> = failwith "todo"
 
-wfPaths : Gen<Path> = failwith "todo"
+let wfPaths : Gen<Path> = failwith "todo"
 
 
 
@@ -154,7 +154,7 @@ wfPaths : Gen<Path> = failwith "todo"
    You may assume that this property is only used with "well-formed"
    generators (meaning that p and fs are well-formed).
 *)
-deleteIsWellFormed (p : Path) (t : FsTree) : bool = true
+let deleteIsWellFormed (p : Path) (t : FsTree) : bool = true
 
 
 
@@ -179,7 +179,7 @@ deleteIsWellFormed (p : Path) (t : FsTree) : bool = true
    You may assume that this property is only used with "well-formed"
    generators (meaning that p and fs are well-formed).
 *)
-createCreates (p : Path) (t : FsTree) : bool = true
+let createCreates (p : Path) (t : FsTree) : bool = true
 
 
 
@@ -203,7 +203,7 @@ createCreates (p : Path) (t : FsTree) : bool = true
    You may assume that this property is only used with "well-formed"
    generators (meaning that p and fs are well-formed).
 *)
-deleteDeletes (p : Path) (t : FsTree) : bool = true
+let deleteDeletes (p : Path) (t : FsTree) : bool = true
 
 
 
@@ -225,7 +225,7 @@ deleteDeletes (p : Path) (t : FsTree) : bool = true
    You may assume that this property is only used with "well-formed"
    generators (meaning that fs is well-formed).
 *)
-showShowsEverything (t : FsTree) : bool = true
+let showShowsEverything (t : FsTree) : bool = true
 
 
 
@@ -253,4 +253,4 @@ showShowsEverything (t : FsTree) : bool = true
    You may assume that this property is only used with "well-formed"
    generators (meaning that fs, p1 and p2 are well-formed).
 *)
-createAndDelete (t : FsTree) (p1 : Path) (p2 : Path) : Property = failwith "todo"
+let createAndDelete (t : FsTree) (p1 : Path) (p2 : Path) : Property = failwith "todo"

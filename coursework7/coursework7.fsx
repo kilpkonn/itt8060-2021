@@ -232,7 +232,8 @@ let createCreates (p : Path) (t : FsTree) : bool =
    You may assume that this property is only used with "well-formed"
    generators (meaning that p and fs are well-formed).
 *)
-let deleteDeletes (p : Path) (t : FsTree) : bool = true
+let deleteDeletes (p : Path) (t : FsTree) : bool =
+  (not (List.contains p (show (delete p t))))
 
 
 

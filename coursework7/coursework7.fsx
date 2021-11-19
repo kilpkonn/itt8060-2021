@@ -103,7 +103,7 @@ let pathWf (p : Path) : bool =
    property? Depends on depth and width but big
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
-  // (pathWf p && fsTreeWf t) ==> fsTreeWf (create p t)|@ $"${p}  <->  ${t}"
+  // (pathWf p && fsTreeWf t) ==> fsTreeWf (create p t) |@ $"${p}  <->  ${t}"
   (pathWf p && fsTreeWf t) ==> (pathWf p && fsTreeWf t && fsTreeWf (create p t))
 
 
@@ -181,7 +181,8 @@ let wfPaths : Gen<Path> =
    You may assume that this property is only used with "well-formed"
    generators (meaning that p and fs are well-formed).
 *)
-let deleteIsWellFormed (p : Path) (t : FsTree) : bool = true
+let deleteIsWellFormed (p : Path) (t : FsTree) : bool =
+  fsTreeWf (delete p t)
 
 
 

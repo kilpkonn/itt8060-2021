@@ -207,7 +207,8 @@ let deleteIsWellFormed (p : Path) (t : FsTree) : bool =
    You may assume that this property is only used with "well-formed"
    generators (meaning that p and fs are well-formed).
 *)
-let createCreates (p : Path) (t : FsTree) : bool = true
+let createCreates (p : Path) (t : FsTree) : bool =
+  (List.filter (fun v -> v = p) (show (create p t)) |> List.length = 1)
 
 
 

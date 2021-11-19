@@ -158,7 +158,7 @@ let wfTrees : Gen<FsTree> =
 
 
 let wfPaths : Gen<Path> = 
-  Gen.listOf randStr |> Gen.map (fun ps -> "root" :: ps)
+  Gen.listOf randStr |> Gen.map (fun ps -> (Gen.sample 5 1 randStr) @ ps)
 
 
 

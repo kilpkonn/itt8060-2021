@@ -104,7 +104,7 @@ let pathWf (p : Path) : bool =
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
   // (pathWf p && fsTreeWf t) ==> fsTreeWf (create p t)|@ $"${p}  <->  ${t}"
-  (pathWf p && fsTreeWf t) ==> pathWf p && fsTreeWf t && fsTreeWf (create p t)
+  (pathWf p && fsTreeWf t) ==> (pathWf p && fsTreeWf t && fsTreeWf (create p t))
 
 
 

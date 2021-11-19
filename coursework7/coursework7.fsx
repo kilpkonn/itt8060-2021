@@ -255,7 +255,8 @@ let deleteDeletes (p : Path) (t : FsTree) : bool =
    You may assume that this property is only used with "well-formed"
    generators (meaning that fs is well-formed).
 *)
-let showShowsEverything (t : FsTree) : bool = true
+let showShowsEverything (t : FsTree) : bool =
+  (show (List.fold (fun acc p -> delete p acc) t (show t)) = [])
 
 
 

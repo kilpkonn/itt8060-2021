@@ -290,4 +290,4 @@ let createAndDelete (t : FsTree) (p1 : Path) (p2 : Path) : Property =
     | ([], _) -> true
     | (x :: xs, y :: ys) -> if x = y then startsWith xs ys else false
     | _ -> false
-  (not (startsWith p1 p2)) ==> (t |> create p1 |> create p2 |> delete p1 |> show |> List.contains p2)
+  (not (startsWith p1 p2) && pathWf p1 && pathWf p2) ==> (t |> create p1 |> create p2 |> delete p1 |> show |> List.contains p2)

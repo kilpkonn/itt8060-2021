@@ -103,8 +103,7 @@ let pathWf (p : Path) : bool =
    property? Depends on depth and width but big
 *)
 let createIsWf (p : Path) (t : FsTree) : Property =
-  // (pathWf p && fsTreeWf t) ==> fsTreeWf (create p t) |@ $"${p}  <->  ${t}"  // NOTE: This should work
-  (pathWf p && fsTreeWf t) ==> (pathWf p && fsTreeWf t && fsTreeWf (create p t))
+  (pathWf p && fsTreeWf t) ==> (lazy fsTreeWf (create p t)) |@ $"${p}  <->  ${t}"
 
 
 
@@ -291,4 +290,4 @@ let createAndDelete (t : FsTree) (p1 : Path) (p2 : Path) : Property =
     | (x :: xs, y :: ys) -> if x = y then startsWith xs ys else false
     | _ -> false
   (not (startsWith p1 p2) && pathWf p1 && pathWf p2) ==>  // NOTE: <- why this no work?
-  (not (startsWith p1 p2) && pathWf p1 && pathWf p2 && (t |> create p1 |> create p2 |> delete p1 |> show |> List.contains p2))
+    (lazy (t |> create p1 |> create p2 |> delete p1 |> show |> List.contains p2))

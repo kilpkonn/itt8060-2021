@@ -201,8 +201,8 @@ let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
 *)
 let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   // NOTE: Maybe should recursive build up to make use cache of lazy
-  failwith $"{m} - {xs} - {ys}"
   let rec calcElem x y =
+    failwith $"{xs} - {ys} - {x} - {y}"
     m (x, y)
     if x = 0 || y = 0 then lazy 0
     else if Array.get xs x = Array.get ys y then lazy ((calcElem (x - 1) (y - 1)).Value + 1)

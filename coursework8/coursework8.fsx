@@ -203,10 +203,15 @@ let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   // NOTE: Maybe should recursive build up to make use cache of lazy
   let rec calcElem x y =
     m (x, y)
-    if x = 0 || y = 0 then 0
-    else if Array.get xs x = Array.get ys y then calcElem (x - 1) (y - 1) + 1
-    else max (calcElem (x - 1) y) (calcElem x (y - 1))
-  Array2D.init xs.Length ys.Length (fun x y -> lazy (calcElem x y))
+    if x = 0 || y = 0 then lazy 0
+    else if Array.get xs x = Array.get ys y then lazy ((calcElem (x - 1) (y - 1)).Value + 1)
+    else lazy (max (calcElem (x - 1) y).Value (calcElem x (y - 1)).Value)
+  Array2D.init xs.Length ys.Length (fun x y -> calcElem x y)
+
+  // let rec buildRec m xs ys =
+  //   match ys with
+  //   | [||] -> xs
+  //   | _ -> Array.append xs (Array.map (fun v) Array.last xs)
 
 
 

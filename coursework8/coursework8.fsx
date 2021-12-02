@@ -211,9 +211,9 @@ let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   // let (xs, ys) = (ys, xs)
   let eval m (xs : 'a []) (ys : 'a []) (xrow : Lazy<int> []) (ylast : Lazy<int>) (x : int) (y : int) : Lazy<int> =
     printfn $"x: {x}, y: {y}, xs: {xs.Length}, ys: {ys.Length}"
-    if x = 0 || y = 0 then lazy (m (y, x); 0)
-    else if (Array.get xs (x - 1)) = (Array.get ys (y - 1)) then lazy (m(y, x); (Array.get xrow (x - 1)).Value + 1)
-    else lazy (m (y, x); max (Array.get xrow (x)).Value ylast.Value)
+    if x = 0 || y = 0 then lazy (m (x, y); 0)
+    else if (Array.get xs (x - 1)) = (Array.get ys (y - 1)) then lazy (m(x, y); (Array.get xrow (x - 1)).Value + 1)
+    else lazy (m (x, y); max (Array.get xrow (y)).Value ylast.Value)
 
   (Array.mapFold (fun xrow x ->
     // printfn $"{xrow} @ {x}"

@@ -122,7 +122,7 @@ let evens (n : int) : int list =
 
 *)
 let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
-  let baseSeq = Seq.ofList xs 
+  let baseSeq =Seq.ofList xs
 
   let rec helper mySeq =
     seq {
@@ -131,7 +131,11 @@ let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
       yield curr
       yield! helper (Seq.append tmpSeq (Seq.singleton curr))
     } |> Seq.cache
-  helper baseSeq
+  
+  seq {
+    yield! baseSeq
+    yield! helper baseSeq
+  }
 
 
 

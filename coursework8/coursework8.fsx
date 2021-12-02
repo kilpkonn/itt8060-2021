@@ -221,7 +221,7 @@ let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
                                     (curr, curr)
                                   ) (lazy 0) [|0..(ys.Length)|])
     (row, row)
-  ) (Array.init (xs.Length) (fun _ -> lazy 0)) [|0..(xs.Length)|]) |> fst |> array2D
+  ) (Array.init (ys.Length) (fun _ -> lazy 0)) [|0..(xs.Length)|]) |> fst |> array2D
 
 
 

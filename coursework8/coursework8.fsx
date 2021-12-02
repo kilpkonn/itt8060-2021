@@ -281,6 +281,7 @@ let eval (e:Expr) : (Map<string, int> -> int) =
     | Ident x ->
       let! env = ask
       return env.Item x
+    // | Neg e -> return ReaderBuilder.Bind (eval e) (fun n -> -n)
     | _ -> return 0
   }
 

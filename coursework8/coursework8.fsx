@@ -202,12 +202,12 @@ let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
 let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   // NOTE: Maybe should recursive build up to make use cache of lazy
   let rec calcElem x y =
-    failwith $"{xs} - {ys} - {x} - {y}"
+    // failwith $"{xs} - {ys} - {x} - {y}"
     m (x, y)
     if x = 0 || y = 0 then lazy 0
     else if Array.get xs x = Array.get ys y then lazy ((calcElem (x - 1) (y - 1)).Value + 1)
     else lazy (max (calcElem (x - 1) y).Value (calcElem x (y - 1)).Value)
-  Array2D.init xs.Length ys.Length (fun x y -> calcElem x y)
+  Array2D.init (xs.Length + 1) (ys.Length + 1) (fun x y -> calcElem x y)
 
   // let rec buildRec m xs ys =
   //   match ys with

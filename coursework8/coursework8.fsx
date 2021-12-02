@@ -217,7 +217,7 @@ let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   (Array.mapFold (fun xrow x ->
     // printfn $"{xrow} @ {x}"
     let row = fst (Array.mapFold (fun ylast y ->
-                                    let curr = eval m xs ys xrow ylast x y
+                                    let curr = eval m ys xs xrow ylast x y
                                     (curr, curr)
                                   ) (lazy 0) [|0..(ys.Length)|])
     (row, row)

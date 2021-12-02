@@ -205,7 +205,7 @@ let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
     // failwith $"{xs} - {ys} - {x} - {y}"
     m (x, y)
     if x = 0 || y = 0 then lazy 0
-    else if Array.get xs x = Array.get ys y then lazy ((calcElem (x - 1) (y - 1)).Value + 1)
+    else if Array.get xs (x - 1) = Array.get ys (y - 1) then lazy ((calcElem (x - 1) (y - 1)).Value + 1)
     else lazy (max (calcElem (x - 1) y).Value (calcElem x (y - 1)).Value)
   Array2D.init (xs.Length + 1) (ys.Length + 1) (fun x y -> calcElem x y)
 

@@ -84,7 +84,7 @@ let triangle : int list seq =
   [1] |> Seq.unfold (fun r -> Some (r, next r))
 
 let evens (n : int) : int list =
-  [1..n] |> List.map (fun x -> 1 <<< x) 
+  [1..2..(2 * n)] |> List.map (fun x -> 1 <<< x) 
 
 
 

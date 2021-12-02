@@ -201,18 +201,27 @@ let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
 *)
 let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   // NOTE: Maybe should recursive build up to make use cache of lazy
-  let rec calcElem x y =
-    // failwith $"{xs} - {ys} - {x} - {y}"
-    m (x, y)
-    if x = 0 || y = 0 then lazy 0
-    else if Array.get xs (x - 1) = Array.get ys (y - 1) then lazy ((calcElem (x - 1) (y - 1)).Value + 1)
-    else lazy (max (calcElem (x - 1) y).Value (calcElem x (y - 1)).Value)
-  Array2D.init (xs.Length + 1) (ys.Length + 1) (fun x y -> calcElem x y)
+  // let rec calcElem x y =
+  //   // failwith $"{xs} - {ys} - {x} - {y}"
+  //   m (x, y)
+  //   if x = 0 || y = 0 then lazy 0
+  //   else if Array.get xs (x - 1) = Array.get ys (y - 1) then lazy ((calcElem (x - 1) (y - 1)).Value + 1)
+  //   else lazy (max (calcElem (x - 1) y).Value (calcElem x (y - 1)).Value)
+  // Array2D.init (xs.Length + 1) (ys.Length + 1) (fun x y -> calcElem x y)
+  let eval m (xs : 'a []) (ys : 'a []) (xrow : Lazy<int> []) (ylast : Lazy<int>) (x : int) (y : int) : Lazy<int> =
+    printfn $"x: {x}, y: {y}, xs: {xs.Length}, ys: {ys.Length}"
+    if x = 0 || y = 0 then lazy (m (x, y); 0)
+    else if Array.get xs (x - 1) = Array.get ys (y - 1) then lazy (m(x, y); (Array.get xrow (x - 1)).Value + 1)
+    else lazy (m (x, y); max (Array.get xrow x).Value ylast.Value)
 
-  // let rec buildRec m xs ys =
-  //   match ys with
-  //   | [||] -> xs
-  //   | _ -> Array.append xs (Array.map (fun v) Array.last xs)
+  (Array.mapFold (fun xrow x ->
+    printfn $"{xrow} @ {x}"
+    let row = fst (Array.mapFold (fun ylast y ->
+                                    let curr = eval m xs ys xrow ylast x y
+                                    (curr, curr)
+                                  ) (lazy 0) [|0..(ys.Length)|])
+    (row, row)
+  ) (Array.init (xs.Length) (fun _ -> lazy 0)) [|0..(xs.Length)|]) |> fst |> array2D
 
 
 

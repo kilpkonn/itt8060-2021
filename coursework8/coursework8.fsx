@@ -209,10 +209,10 @@ let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   //   else lazy (max (calcElem (x - 1) y).Value (calcElem x (y - 1)).Value)
   // Array2D.init (xs.Length + 1) (ys.Length + 1) (fun x y -> calcElem x y)
   let eval m (xs : 'a []) (ys : 'a []) (xrow : Lazy<int> []) (ylast : Lazy<int>) (x : int) (y : int) : Lazy<int> =
-    // printfn $"x: {x}, y: {y}, xs: {xs.Length}, ys: {ys.Length}"
+    printfn $"x: {x}, y: {y}, xs: {xs.Length}, ys: {ys.Length}"
     if x = 0 || y = 0 then lazy (m (x, y); 0)
-    else if Array.get xs (x) = Array.get ys (y) then lazy (m(x, y); (Array.get xrow (x - 1)).Value + 1)
-    else lazy (m (x, y); max (Array.get xrow x).Value ylast.Value)
+    else if Array.get xs (x - 1) = Array.get ys (y - 1) then lazy (m(x, y); (Array.get xrow (x - 1)).Value + 1)
+    else lazy (m (x, y); max (Array.get xrow (x-1)).Value ylast.Value)
 
   (Array.mapFold (fun xrow x ->
     // printfn $"{xrow} @ {x}"

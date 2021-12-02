@@ -126,7 +126,7 @@ let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
     seq {
       yield! Seq.ofList xs
       yield f xs
-    }
+    } |> Seq.cache
 
   let rec helper mySeq =
     seq {

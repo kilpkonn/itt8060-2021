@@ -199,6 +199,7 @@ let rec generate (xs : 'a list) (f : 'a list -> 'a) : 'a seq =
   order of calculations visible.
 
 *)
+// lcs (fun (a, b) -> printfn $"{a} - {b}") [|0; 2|] [|2; 1; -2; 2|];;
 let lcs (m : (int * int) -> unit) (xs : 'a []) (ys : 'a []) : Lazy<int> [,] =
   // NOTE: Maybe should recursive build up to make use cache of lazy
   // let rec calcElem x y =

@@ -291,14 +291,24 @@ type Expr =
   | Let    of string * Expr * Expr // let expression, the string is the identifier.
 
 
-let eval (e:Expr) : (Map<string, int> -> int) =
+let rec eval (e:Expr) : (Map<string, int> -> int) =
   reader {
     match e with
     | Const n -> return n
     | Ident x ->
       let! env = ask
       return env.Item x
-    // | Neg e -> return ReaderBuilder.Bind (eval e) (fun n -> -n)
+    | Neg e ->
+      let! res = eval e
+      return -res
+    | Sum (a, b) ->
+      let! a = eval a
+      let! b = eval b
+      return a + b
+    | Diff (a, b) ->
+      let! a = eval a
+      let! b = eval b
+      return a - b
     | _ -> return 0
   }
 

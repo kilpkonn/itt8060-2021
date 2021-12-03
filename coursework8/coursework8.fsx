@@ -292,24 +292,26 @@ type Expr =
 
 
 let rec eval (e:Expr) : (Map<string, int> -> int) =
-  reader {
-    match e with
-    | Const n -> return n
-    | Ident x ->
-      let! env = ask
-      return env.Item x
-    | Neg e ->
-      let! res = eval e
-      return -res
-    | Sum (a, b) ->
+  let map a b f = reader {
       let! a = eval a
       let! b = eval b
-      return a + b
-    | Diff (a, b) ->
-      let! a = eval a
-      let! b = eval b
-      return a - b
-    | _ -> return 0
+      return f a b
+  }
+  match e with
+  | Const n -> reader.Return n
+  | Ident x -> reader.Bind (ask, (fun env -> reader.Return (env.Item x)))
+  | Neg e -> reader.Bind (eval e, (fun v -> reader.Return -v))
+  | Sum (a, b) -> map a b (+)
+  | Diff (a, b) -> map a b (-)
+  | Prod (a, b) -> map a b (*)
+  | Div (a, b) -> map a b (/)
+  | DivRem (a, b) -> map a b (%)
+  | Let (var, a, b) -> reader {
+    let! env = ask
+    let! x = eval a
+    let env = env.Add(var, x)
+    let y = eval b
+    return (runReader y env)
   }
 
 // //Example:

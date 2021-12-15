@@ -284,9 +284,9 @@ let display n (bs: bool []) : string =
 
 *)
 
-let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) : IObservable<' u> =
-  Observable.scan (fun (i, _) v ->  f i v) (t, None)
-  >> Observable.choose snd
+let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) (obs : IObservable<'a>) : IObservable<' u> =
+  obs |> Observable.scan (fun (i, _) v ->  f i v) (t, None)
+  |> Observable.choose snd
 
 
 

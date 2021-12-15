@@ -314,6 +314,7 @@ let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) (obs : System.IObservab
 
 let chunks (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a list> =
   obs |> Observable.scan (fun s v -> if List.length s = n then [v] else v :: s) []
+  |> Observable.filter (fun os -> List.length os = n)
   |> Observable.map List.rev
 
 

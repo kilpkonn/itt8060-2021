@@ -284,7 +284,7 @@ let display n (bs: bool []) : string =
 
 *)
 
-let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) (obs : IObservable<'a>) : IObservable<' u> =
+let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) (obs : System.IObservable<'a>) : System.IObservable<'u> =
   obs |> Observable.scan (fun (i, _) v ->  f i v) (t, None)
   |> Observable.choose snd
 

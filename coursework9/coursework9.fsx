@@ -136,8 +136,14 @@ let rec mandelbrot (n: int) (c: Complex): bool =
    Try to divide fairly.
 *)
 
-let divide m n = failwith "not implemented"
-
+let divide (m: int) (n: int): (int * int) seq =
+  let perChunk = n / m
+  let andOnes = n % perChunk
+  let d i = if i <= andOnes then i else andOnes
+  seq {
+    for i in 0..m do
+      yield i * perChunk + (d i), (i + 1) * perChunk + (d (i + 1)) - 1
+  }
 
 
 

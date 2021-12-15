@@ -92,10 +92,10 @@ type Complex = double * double
 
 *)
 
-let rec mandelbrot n c =
+let rec mandelbrot (n: int) (c: Complex): bool =
   let (a, b) = c
-  if n <= 0 then a * a + b * b < 4
-  else mandelbrot (n - 1) (a * a - b * b, 2 * a * b)
+  if n <= 0 then a * a + b * b < 4.0
+  else mandelbrot (n - 1) (a * a - b * b, 2.0 * a * b)
 
 
 

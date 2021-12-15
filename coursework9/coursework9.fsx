@@ -232,8 +232,10 @@ let mandelbrotAsync m n start finish cs : Async<bool[]> =
 
 *)
 
-let display n bs = failwith "not implemented"
-
+let display n (bs: bool []) : string = 
+  bs |> Array.chunkBySize n
+  |> Array.map (Array.map (fun b -> if b then "*" else ".") >> String.concat "")
+  |> String.concat "\n"
 
 
 

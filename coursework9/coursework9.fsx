@@ -141,7 +141,7 @@ let divide (m: int) (n: int): (int * int) seq =
   let andOnes = n % perChunk
   let d i = if i <= andOnes then i else andOnes
   seq {
-    for i in 0..m do
+    for i in 0..(m-1) do
       yield i * perChunk + (d i), (i + 1) * perChunk + (d (i + 1)) - 1
   }
 

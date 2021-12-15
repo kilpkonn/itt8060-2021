@@ -96,7 +96,7 @@ let rec mandelbrot (n: int) (c: Complex): bool =
   let (a, b) = c
   if a * a + b * b > 4.0 then false
   else if n < 0 then true
-  else mandelbrot (n - 1) (a * a - b * b, 2.0 * a * b)
+  else mandelbrot (n - 1) (a * a - b * b + a, 2.0 * a * b + b)
 
 
 

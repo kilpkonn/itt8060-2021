@@ -188,7 +188,7 @@ let mandelbrotAsync m n start finish cs : Async<bool[]> =
                   Seq.map (fun (s, e) -> 
                     async {
                       start s
-                      let res = seq {s .. e} |> Seq.map (fun i -> mandelbrot n (Array.get cs i)) |> Seq.toArray
+                      let res = seq {s .. e} |> Seq.map (mandelbrot n << Array.get cs) |> Seq.toArray
                       finish e
                       return res
                     }
@@ -233,8 +233,9 @@ let mandelbrotAsync m n start finish cs : Async<bool[]> =
 *)
 
 let display n (bs: bool []) : string = 
+  let padTrailing s = if String.length s >= n then s else s + String.replicate (n - String.length s) "."
   bs |> Array.chunkBySize n
-  |> Array.map (Array.map (fun b -> if b then "*" else ".") >> String.concat "")
+  |> Array.map (Array.map (fun b -> if b then "*" else ".") >> String.concat "" >> padTrailing)
   |> String.concat "\n"
 
 

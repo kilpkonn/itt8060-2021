@@ -92,7 +92,7 @@ type Complex = double * double
 
 *)
 
-let rec mandelbrot (n: int) (c: Complex): bool =
+let mandelbrot (n: int) (c: Complex): bool =
   let (a0, b0) = c
   let rec helper n (a, b) =
     if a * a + b * b > 4.0 then false
@@ -140,7 +140,6 @@ let divide (m: int) (n: int): (int * int) seq =
   let perChunk = n / m
   let andOnes = n - perChunk * m
   let d i = if i < andOnes then i else andOnes
-
   seq {
     for i in 0..(m-1) do
       yield i * perChunk + (d i), (i + 1) * perChunk + (d (i + 1)) - 1

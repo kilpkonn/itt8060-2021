@@ -312,7 +312,8 @@ let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) (obs : System.IObservab
 
 *)
 
-let chunks n obs = failwith "not implemented"
+let chunks (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a list> =
+  obs |> Observable.scan (fun s v -> if s.Length = n then [v] else v :: s) []
 
 
 

@@ -284,7 +284,9 @@ let display n (bs: bool []) : string =
 
 *)
 
-let accumulate f t obs = failwith "not implemented"
+let accumulate (f : 't -> 'a -> 't * 'u option) (t : 't) : IObservable<' u> =
+  Observable.scan (fun (i, _) v ->  f i v) (t, None)
+  >> Observable.choose snd
 
 
 

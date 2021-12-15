@@ -182,7 +182,19 @@ let divide (m: int) (n: int): (int * int) seq =
 
 *)
 
-let mandelbrotAsync m n start finish cs = failwith "not implemented"
+let mandelbrotAsync m n start finish cs : Async<bool[]> =
+  async {
+    let! nested = divide m (Array.length cs) |>
+                  Seq.map (fun (s, e) -> 
+                    async {
+                      start s
+                      let res = seq {s .. e} |> Seq.map (fun i -> mandelbrot n (Array.get cs i)) |> Seq.toArray
+                      finish e
+                      return res
+                    }
+                  ) |> Async.Parallel
+    return Array.collect id nested
+  }
 
 
 

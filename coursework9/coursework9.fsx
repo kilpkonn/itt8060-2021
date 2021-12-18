@@ -372,7 +372,16 @@ let sliding (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a lis
 
 *)
 
-let limit clock obs = failwith "not implemented"
+type Either<'a, 'b> = Left of 'a | Right of 'b 
+
+let limit (clock : System.IObservable<unit>) (obs : System.IObservable<'a>) : System.IObservable<'a> =
+  let clock' : System.IObservable<Either<unit, 'a>> = Observable.map Left clock
+  let obs' : System.IObservable<Either<unit, 'a>> = Observable.map Right obs
+  Observable.merge clock' obs'
+  |> Observable.scan (fun (emit, msg) e -> match e with 
+                                           | Left _ -> (true, None) 
+                                           | Right msg -> (false, if emit then Some(msg) else None)) (true, None) 
+  |> Observable.choose (fun (emit, msg) -> if emit then msg else None)
 
 
 

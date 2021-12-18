@@ -188,7 +188,7 @@ let mandelbrotAsync m n start finish cs : Async<bool[]> =
                   Seq.map (fun (s, e) -> 
                     async {
                       start s
-                      let res = seq {s .. e} |> Seq.map (mandelbrot n << Array.get cs) |> Seq.toArray
+                      let res = [| s .. e |] |> Array.map (mandelbrot n << Array.get cs)
                       finish e
                       return res
                     }
@@ -342,8 +342,9 @@ let chunks (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a list
 
 *)
 
+let removeLast = List.rev << List.tail << List.rev
+
 let sliding (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a list> =
-  let removeLast = List.rev << List.tail << List.rev
   obs |> Observable.scan (fun s v -> if List.length s = n then v :: (removeLast s) else v :: s) []
   |> Observable.filter (fun os -> List.length os = n)
   |> Observable.map List.rev
@@ -412,6 +413,23 @@ let limit (clock : System.IObservable<unit>) (obs : System.IObservable<'a>) : Sy
 
 *)
 
-let alarm n threshold clock obs = failwith "not implemented"
+let alarm (n : int) (threshold : int) (clock : System.IObservable<unit>) (obs : System.IObservable<int>) : System.IObservable<unit> =
+  let clock' : System.IObservable<int option> = Observable.map (fun _ -> None) clock
+  let obs' : System.IObservable<int option> = Observable.map Some obs
+  Observable.merge obs' clock'
+  |> Observable.scan (fun os e ->
+    Option.bind (fun o ->
+      Option.bind (fun os -> 
+        Some (o :: (if List.length os >= n then removeLast os else os))
+      ) os
+    ) e) (Some [])
+  |> Observable.filter (fun v -> match v with
+                                 | Some os -> List.average (List.map float os) > float threshold
+                                 | None -> true)
+  |> Observable.scan (fun (emit, ev) os -> match os with
+                                           | Some os -> if emit then (false, Some ()) else (emit, None)
+                                           | None -> (true, None)) (true, None)
+  |> Observable.choose snd
+
 
 

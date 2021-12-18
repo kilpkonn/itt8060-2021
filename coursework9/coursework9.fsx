@@ -424,7 +424,7 @@ let alarm (n : int) (threshold : int) (clock : System.IObservable<unit>) (obs : 
       ) os
     ) e) (Some [])
   |> Observable.filter (fun v -> match v with
-                                 | Some os -> List.average (List.map float os) > float threshold
+                                 | Some os -> List.average (List.map float os) >= float threshold
                                  | None -> true)
   |> Observable.scan (fun (emit, ev) os -> match os with
                                            | Some os -> if emit then (false, Some ()) else (emit, None)

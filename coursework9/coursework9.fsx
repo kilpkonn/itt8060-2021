@@ -381,7 +381,7 @@ let limit (clock : System.IObservable<unit>) (obs : System.IObservable<'a>) : Sy
   |> Observable.scan (fun (emit, msg) e -> match e with 
                                            | Left _ -> (true, None) 
                                            | Right msg -> (false, if emit then Some(msg) else None)) (true, None) 
-  |> Observable.choose (fun (emit, msg) -> if emit then msg else None)
+  |> Observable.choose snd
 
 
 

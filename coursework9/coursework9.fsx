@@ -342,9 +342,8 @@ let chunks (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a list
 
 *)
 
-let removeLast = List.rev << List.tail << List.rev
-
 let sliding (n : int) (obs : System.IObservable<'a>) : System.IObservable<'a list> =
+  let removeLast = List.rev << List.tail << List.rev
   obs |> Observable.scan (fun s v -> if List.length s = n then v :: (removeLast s) else v :: s) []
   |> Observable.filter (fun os -> List.length os = n)
   |> Observable.map List.rev
@@ -414,6 +413,7 @@ let limit (clock : System.IObservable<unit>) (obs : System.IObservable<'a>) : Sy
 *)
 
 let alarm (n : int) (threshold : int) (clock : System.IObservable<unit>) (obs : System.IObservable<int>) : System.IObservable<unit> =
+  let removeLast = List.rev << List.tail << List.rev
   let clock' : System.IObservable<int option> = Observable.map (fun _ -> None) clock
   let obs' : System.IObservable<int option> = Observable.map Some obs
   Observable.merge obs' clock'

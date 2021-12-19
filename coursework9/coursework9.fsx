@@ -417,18 +417,16 @@ let alarm (n : int) (threshold : int) (clock : System.IObservable<unit>) (obs : 
   let clock' : System.IObservable<int option> = Observable.map (fun _ -> None) clock
   let obs' : System.IObservable<int option> = Observable.map Some obs
   Observable.merge obs' clock'
-  |> Observable.scan (fun os e ->
-    Option.bind (fun o ->
-      Option.bind (fun os -> 
-        Some (o :: (if List.length os >= n then removeLast os else os))
-      ) os
-    ) e) (Some [])
-  // |> Observable.filter (fun v -> match v with
-  //                                | Some os -> List.average (List.map float os) > float threshold
-  //                                | None -> true)
-  |> Observable.scan (fun (emit, ev) os -> match os with
-                                           | Some os -> (false, if emit then Some () else None)
-                                           | None -> (true, None)) (true, None)
+  |> Observable.scan (fun (os, _) e ->
+      match (e) with
+      | Some o -> (o :: (if List.length os >= n then removeLast os else os), true)
+      | None -> (os, false)) ([], true)
+  |> Observable.filter (fun (v, b) -> match b with
+                                      | true -> List.average (List.map float v) > float threshold
+                                      | false -> true)
+  |> Observable.scan (fun (emit, ev) (os, b) -> match b with
+                                                | true -> (false, if emit then Some () else None)
+                                                | false -> (true, None)) (true, None)
   |> Observable.choose snd
 
 
